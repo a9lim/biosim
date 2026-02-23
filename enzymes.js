@@ -5,21 +5,31 @@
 const EnzymeStyles = {
   // ---------- Color Palettes ----------
   colors: {
-    respiratory: { fill: '#164e63', stroke: '#22d3ee', glow: 'rgba(34,211,238,0.35)' },
-    photosynthetic: { fill: '#422006', stroke: '#fbbf24', glow: 'rgba(251,191,36,0.35)' },
-    shared: { fill: '#1e3a5f', stroke: '#5eead4', glow: 'rgba(94,234,212,0.3)' },
-    atpSynthase: { fill: '#14532d', stroke: '#34d399', glow: 'rgba(52,211,153,0.35)' },
-    krebs: { fill: '#1e293b', stroke: '#38bdf8', glow: 'rgba(56,189,248,0.25)' },
-    krebsActive: { fill: '#0c4a6e', stroke: '#22d3ee', glow: 'rgba(34,211,238,0.5)' },
-    calvin: { fill: '#052e16', stroke: '#34d399', glow: 'rgba(52,211,153,0.3)' },
-    calvinActive: { fill: '#064e3b', stroke: '#6ee7b7', glow: 'rgba(110,231,183,0.5)' },
-    glycolysis: { fill: '#431407', stroke: '#fb923c', glow: 'rgba(251,146,60,0.3)' },
-    glycolysisActive: { fill: '#7c2d12', stroke: '#fdba74', glow: 'rgba(253,186,116,0.5)' },
-    bacteriorhodopsin: { fill: '#4a1942', stroke: '#e879f9', glow: 'rgba(232,121,249,0.35)' },
-    cyclic: { fill: '#3b0764', stroke: '#c084fc', glow: 'rgba(192,132,252,0.35)' },
-    ppp: { fill: '#1e1b4b', stroke: '#818cf8', glow: 'rgba(129,140,248,0.25)' },
-    pppActive: { fill: '#312e81', stroke: '#a5b4fc', glow: 'rgba(165,180,252,0.5)' },
+    respiratory: { fill: '#164e63', stroke: '#38bdf8', glow: 'rgba(56,189,248,0.35)', strokeLight: '#0284c7', glowRgba: '56,189,248' },
+    photosynthetic: { fill: '#064e3b', stroke: '#10b981', glow: 'rgba(16,185,129,0.35)', strokeLight: '#059669', glowRgba: '16,185,129' },
+    shared: { fill: '#431407', stroke: '#fb923c', glow: 'rgba(251,146,60,0.3)', strokeLight: '#ea580c', glowRgba: '251,146,60' },
+    atpSynthase: { fill: '#431407', stroke: '#fb923c', glow: 'rgba(251,146,60,0.35)', strokeLight: '#ea580c', glowRgba: '251,146,60' },
+    krebs: { fill: '#082f49', stroke: '#38bdf8', glow: 'rgba(56,189,248,0.25)', strokeLight: '#0284c7', glowRgba: '56,189,248' },
+    krebsActive: { fill: '#0c4a6e', stroke: '#38bdf8', glow: 'rgba(56,189,248,0.5)', strokeLight: '#0284c7', glowRgba: '56,189,248' },
+    calvin: { fill: '#052e16', stroke: '#10b981', glow: 'rgba(16,185,129,0.3)', strokeLight: '#059669', glowRgba: '16,185,129' },
+    calvinActive: { fill: '#064e3b', stroke: '#10b981', glow: 'rgba(16,185,129,0.5)', strokeLight: '#059669', glowRgba: '16,185,129' },
+    glycolysis: { fill: '#431407', stroke: '#fb923c', glow: 'rgba(251,146,60,0.3)', strokeLight: '#ea580c', glowRgba: '251,146,60' },
+    glycolysisActive: { fill: '#7c2d12', stroke: '#fb923c', glow: 'rgba(251,146,60,0.5)', strokeLight: '#ea580c', glowRgba: '251,146,60' },
+    bacteriorhodopsin: { fill: '#4a1942', stroke: '#c084fc', glow: 'rgba(192,132,252,0.35)', strokeLight: '#9333ea', glowRgba: '192,132,252' },
+    cyclic: { fill: '#3b0764', stroke: '#c084fc', glow: 'rgba(192,132,252,0.35)', strokeLight: '#9333ea', glowRgba: '192,132,252' },
+    ppp: { fill: '#1e1b4b', stroke: '#c084fc', glow: 'rgba(192,132,252,0.25)', strokeLight: '#9333ea', glowRgba: '192,132,252' },
+    pppActive: { fill: '#312e81', stroke: '#c084fc', glow: 'rgba(192,132,252,0.5)', strokeLight: '#9333ea', glowRgba: '192,132,252' },
     membrane: { fill: 'rgba(30,58,95,0.6)', stroke: 'rgba(56,189,248,0.15)' },
+  },
+
+  getPalette(key, lightMode, glowIntensity = 0) {
+    const p = this.colors[key];
+    if (!lightMode) return p;
+    return {
+      fill: 'rgba(255,255,255,0.95)',
+      stroke: p.strokeLight || p.stroke,
+      glow: glowIntensity > 0 ? `rgba(${p.glowRgba || '148,163,184'},${glowIntensity * 0.05})` : ''
+    };
   },
 
   /* ---- Generic shape helpers ---- */
@@ -87,7 +97,7 @@ const EnzymeStyles = {
     ctx.fill();
     ctx.shadowBlur = 0;
     ctx.strokeStyle = palette.stroke;
-    ctx.lineWidth = 1.5;
+    ctx.lineWidth = 1.0;
     ctx.stroke();
   },
 
@@ -96,9 +106,7 @@ const EnzymeStyles = {
     ctx.fillStyle = color || '#e2e8f0';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.globalAlpha = 1.0;
     ctx.fillText(text, cx, cy);
-    ctx.globalAlpha = 1;
   },
 
   /* ====================================================================
@@ -107,51 +115,53 @@ const EnzymeStyles = {
 
   drawNDH1(ctx, cx, cy, w, h, glow, lightMode) {
     this.roundedRect(ctx, cx - w / 2, cy - h / 2, w, h, 5);
-    const p = lightMode
-      ? { fill: 'rgba(255,255,255,0.95)', stroke: '#0369a1', glow: glow > 0 ? `rgba(14,165,233,${glow * 0.05})` : '' }
-      : this.colors.respiratory;
+    const p = this.getPalette('respiratory', lightMode, glow);
     this.applyStyle(ctx, p, glow);
-    this.drawLabel(ctx, 'NDH-1', cx, cy - 6, p.stroke, 9);
-    // Removed duplicate internal 4H+
+    this.drawLabel(ctx, 'NDH-1', cx, cy - 4, p.stroke, 9);
+    this.drawLabel(ctx, 'CI', cx, cy + 7, lightMode ? '#0c4a6e' : '#38bdf8', 7);
   },
 
   drawSDH(ctx, cx, cy, size, glow, lightMode) {
     this.diamond(ctx, cx, cy, size, size);
-    const p = lightMode
-      ? { fill: 'rgba(255,255,255,0.95)', stroke: '#0369a1', glow: glow > 0 ? `rgba(14,165,233,${glow * 0.05})` : '' }
-      : this.colors.respiratory;
+    const p = this.getPalette('respiratory', lightMode, glow);
     this.applyStyle(ctx, p, glow);
     this.drawLabel(ctx, 'SDH', cx, cy - 4, p.stroke, 9);
-    this.drawLabel(ctx, 'CII', cx, cy + 7, lightMode ? '#0c4a6e' : '#67e8f9', 7);
+    this.drawLabel(ctx, 'CII', cx, cy + 7, lightMode ? '#0c4a6e' : '#38bdf8', 7);
   },
 
   drawPSII(ctx, cx, cy, w, h, glow, lightMode) {
     // Tall rectangle spanning membrane
     this.roundedRect(ctx, cx - w / 2, cy - h / 2, w, h, 5);
-    const p = lightMode
-      ? { fill: 'rgba(255,255,255,0.95)', stroke: '#b45309', glow: glow > 0 ? `rgba(245,158,11,${glow * 0.05})` : '' }
-      : this.colors.photosynthetic;
+    const p = this.getPalette('photosynthetic', lightMode, glow);
     this.applyStyle(ctx, p, glow);
+    // Chlorophyll reaction center (P680)
+    ctx.beginPath();
+    ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+    const innerColor = lightMode ? `rgba(${this.colors.photosynthetic.glowRgba},0.35)` : 'rgba(52,211,153,0.35)';
+    ctx.fillStyle = innerColor;
+    ctx.fill();
     this.drawLabel(ctx, 'PSII', cx, cy - 8, p.stroke, 9);
-    this.drawLabel(ctx, 'P680', cx, cy + 5, lightMode ? '#92400e' : '#fcd34d', 7);
+    this.drawLabel(ctx, 'P680', cx, cy + 5, lightMode ? '#064e3b' : '#10b981', 7);
     // Removed duplicate internal 4H+
   },
 
   drawPSI(ctx, cx, cy, w, h, glow, lightMode) {
     this.roundedRect(ctx, cx - w / 2, cy - h / 2, w, h, 5);
-    const p = lightMode
-      ? { fill: 'rgba(255,255,255,0.95)', stroke: '#b45309', glow: glow > 0 ? `rgba(245,158,11,${glow * 0.05})` : '' }
-      : this.colors.photosynthetic;
+    const p = this.getPalette('photosynthetic', lightMode, glow);
     this.applyStyle(ctx, p, glow);
+    // Chlorophyll reaction center (P700)
+    ctx.beginPath();
+    ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+    const innerColor = lightMode ? `rgba(${this.colors.photosynthetic.glowRgba},0.35)` : 'rgba(52,211,153,0.35)';
+    ctx.fillStyle = innerColor;
+    ctx.fill();
     this.drawLabel(ctx, 'PSI', cx, cy - 5, p.stroke, 9);
-    this.drawLabel(ctx, 'P700', cx, cy + 6, lightMode ? '#92400e' : '#fcd34d', 7);
+    this.drawLabel(ctx, 'P700', cx, cy + 6, lightMode ? '#064e3b' : '#10b981', 7);
   },
 
   drawCytB6f(ctx, cx, cy, w, h, glow, lightMode) {
     this.roundedRect(ctx, cx - w / 2, cy - h / 2, w, h, 5);
-    const p = lightMode
-      ? { fill: 'rgba(255,255,255,0.95)', stroke: '#0d9488', glow: glow > 0 ? `rgba(20,184,166,${glow * 0.05})` : '' }
-      : this.colors.shared;
+    const p = this.getPalette('shared', lightMode, glow);
     this.applyStyle(ctx, p, glow);
     this.drawLabel(ctx, 'Cyt', cx, cy - 4, p.stroke, 9);
     this.drawLabel(ctx, 'b6f', cx, cy + 6, p.stroke, 9);
@@ -160,9 +170,7 @@ const EnzymeStyles = {
 
   drawCytOx(ctx, cx, cy, w, h, glow, lightMode) {
     this.roundedRect(ctx, cx - w / 2, cy - h / 2, w, h, 5);
-    const p = lightMode
-      ? { fill: 'rgba(255,255,255,0.95)', stroke: '#0891b2', glow: glow > 0 ? `rgba(6,182,212,${glow * 0.05})` : '' }
-      : this.colors.respiratory;
+    const p = this.getPalette('respiratory', lightMode, glow);
     this.applyStyle(ctx, p, glow);
     this.drawLabel(ctx, 'Cyt c', cx, cy - 6, p.stroke, 8);
     this.drawLabel(ctx, 'Ox', cx, cy + 4, p.stroke, 8);
@@ -173,9 +181,7 @@ const EnzymeStyles = {
     ctx.beginPath();
     ctx.arc(cx, cy, radius, 0, Math.PI * 2);
     ctx.closePath();
-    const p = lightMode
-      ? { fill: 'rgba(255,255,255,0.95)', stroke: '#0891b2', glow: glow > 0 ? `rgba(6,182,212,${glow * 0.05})` : '' }
-      : this.colors.shared;
+    const p = this.getPalette('photosynthetic', lightMode, glow);
     this.applyStyle(ctx, p, glow);
     this.drawLabel(ctx, 'PC', cx, cy, p.stroke, 8);
   },
@@ -184,27 +190,21 @@ const EnzymeStyles = {
     ctx.beginPath();
     ctx.arc(cx, cy, radius, 0, Math.PI * 2);
     ctx.closePath();
-    const p = lightMode
-      ? { fill: 'rgba(255,255,255,0.95)', stroke: '#ca8a04', glow: glow > 0 ? `rgba(234,179,8,${glow * 0.05})` : '' }
-      : this.colors.photosynthetic;
+    const p = this.getPalette('photosynthetic', lightMode, glow);
     this.applyStyle(ctx, p, glow);
     this.drawLabel(ctx, 'Fd', cx, cy, p.stroke, 8);
   },
 
   drawFNR(ctx, cx, cy, w, h, glow, lightMode) {
     this.pill(ctx, cx, cy, w, h);
-    const p = lightMode
-      ? { fill: 'rgba(255,255,255,0.95)', stroke: '#ca8a04', glow: glow > 0 ? `rgba(234,179,8,${glow * 0.05})` : '' }
-      : this.colors.photosynthetic;
+    const p = this.getPalette('photosynthetic', lightMode, glow);
     this.applyStyle(ctx, p, glow);
     this.drawLabel(ctx, 'FNR', cx, cy, p.stroke, 9);
   },
 
   drawPQ(ctx, cx, cy, w, h, glow, lightMode) {
     this.pill(ctx, cx, cy, w, h);
-    const p = lightMode
-      ? { fill: 'rgba(255,255,255,0.95)', stroke: '#0284c7', glow: glow > 0 ? `rgba(14,165,233,${glow * 0.05})` : '' }
-      : this.colors.shared;
+    const p = this.getPalette('shared', lightMode, glow);
     this.applyStyle(ctx, p, glow);
     this.drawLabel(ctx, 'PQ', cx, cy, p.stroke, 9);
   },
@@ -212,9 +212,7 @@ const EnzymeStyles = {
   drawATPSynthase(ctx, cx, cy, w, h, rotation, glow, lightMode) {
     // Tall shape spanning membrane with spinning rotor
     this.roundedRect(ctx, cx - w / 2, cy - h / 2, w, h, 5);
-    const p = lightMode
-      ? { fill: 'rgba(255,255,255,0.95)', stroke: '#059669', glow: glow > 0 ? `rgba(16,185,129,${glow * 0.05})` : '' }
-      : this.colors.atpSynthase;
+    const p = this.getPalette('atpSynthase', lightMode, glow);
     this.applyStyle(ctx, p, glow);
 
     // Rotor blades inside
@@ -225,7 +223,8 @@ const EnzymeStyles = {
       const a = (Math.PI * 2 / 6) * i;
       ctx.beginPath();
       ctx.ellipse(Math.cos(a) * 7, Math.sin(a) * 7, 5, 2, a, 0, Math.PI * 2);
-      ctx.fillStyle = lightMode ? 'rgba(16,185,129,0.3)' : 'rgba(52,211,153,0.3)';
+      const bladeColor = lightMode ? `rgba(${this.colors.atpSynthase.glowRgba},0.3)` : 'rgba(251,146,60,0.3)';
+      ctx.fillStyle = bladeColor;
       ctx.fill();
     }
     ctx.restore();
@@ -245,14 +244,13 @@ const EnzymeStyles = {
       if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
     }
     ctx.closePath();
-    const p = lightMode
-      ? { fill: 'rgba(255,255,255,0.95)', stroke: '#9333ea', glow: glow > 0 ? `rgba(168,85,247,${glow * 0.05})` : '' }
-      : this.colors.bacteriorhodopsin;
+    const p = this.getPalette('bacteriorhodopsin', lightMode, glow);
     this.applyStyle(ctx, p, glow);
     // Retinal chromophore — small inner circle
     ctx.beginPath();
     ctx.arc(cx, cy, 4, 0, Math.PI * 2);
-    ctx.fillStyle = lightMode ? 'rgba(168,85,247,0.35)' : 'rgba(232,121,249,0.35)';
+    const innerColor = lightMode ? `rgba(${this.colors.bacteriorhodopsin.glowRgba},0.35)` : 'rgba(192,132,252,0.35)';
+    ctx.fillStyle = innerColor;
     ctx.fill();
     this.drawLabel(ctx, 'BR', cx, cy, p.stroke, 9);
     // Removed duplicate internal 1H+
@@ -319,6 +317,7 @@ const EnzymeStyles = {
         ? { fill: 'rgba(51,65,85,0.9)', stroke: '#e2e8f0', glow: 'rgba(226,232,240,0.3)' }
         : { fill: 'rgba(30,41,59,0.7)', stroke: 'rgba(148,163,184,0.5)', glow: '' };
     }
+    ctx.lineWidth = 1.0;
     this.applyStyle(ctx, palette, active ? 6 : 0);
     ctx.font = '600 7px JetBrains Mono, monospace';
     ctx.fillStyle = lightMode
@@ -356,17 +355,15 @@ const EnzymeStyles = {
     }
     ctx.fill();
     ctx.strokeStyle = color;
-    ctx.globalAlpha = active ? 0.8 : 0.3;
-    ctx.lineWidth = 0.8;
+    ctx.lineWidth = 1.0;
     ctx.stroke();
     ctx.globalAlpha = 1;
 
-    ctx.fillStyle = lightMode ? (active ? '#0f172a' : '#475569') : color;
-    ctx.globalAlpha = active ? 1 : 0.5;
+    ctx.fillStyle = color;
+    ctx.globalAlpha = 1;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(label, cx, cy);
-    ctx.globalAlpha = 1;
   },
 
   /* ---- Membrane band ---- */

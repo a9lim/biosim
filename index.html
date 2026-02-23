@@ -85,6 +85,15 @@
             </label>
           </div>
         </div>
+        <div class="control-row">
+          <label for="autoplay-toggle">Auto-Play</label>
+          <div class="toggle-wrapper" style="margin-left:auto">
+            <input type="checkbox" id="autoplay-toggle">
+            <label for="autoplay-toggle" class="toggle-switch">
+              <span class="toggle-knob"></span>
+            </label>
+          </div>
+        </div>
         <div class="control-row" style="flex-direction:column;align-items:flex-start;gap:2px">
           <small style="color:var(--text-muted);font-size:0.75rem">💡 Click enzyme labels on the canvas to advance
             reactions</small>
@@ -130,6 +139,14 @@
         <div class="stat-row">
           <span class="stat-label">H⁺ Pumped (total)</span>
           <span class="stat-value" id="protons-pumped">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">CO₂ Fixed</span>
+          <span class="stat-value" id="co2-fixed">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">CO₂ Produced</span>
+          <span class="stat-value" id="co2-produced">0</span>
         </div>
         <div class="stat-row">
           <span class="stat-label">O₂ Produced</span>
@@ -184,15 +201,15 @@
           <span class="pw-name">PPP</span>
           <span class="pw-eq">G6P → R5P + 2 NADPH + CO₂</span>
         </div>
-        <div class="pathway-eq etc-eq">
+        <div class="pathway-eq etc-eq oxphos-eq">
           <span class="pw-name">Oxid. Phos.</span>
           <span class="pw-eq">NADH + H⁺ + ½O₂ → NAD⁺ + H₂O (10 H⁺)</span>
         </div>
-        <div class="pathway-eq etc-eq">
+        <div class="pathway-eq etc-eq light-eq">
           <span class="pw-name">Linear Light</span>
           <span class="pw-eq">H₂O + NADP⁺ → ½O₂ + NADPH + H⁺ (6 H⁺)</span>
         </div>
-        <div class="pathway-eq etc-eq">
+        <div class="pathway-eq etc-eq cyclic-eq">
           <span class="pw-name">Cyclic Light</span>
           <span class="pw-eq">Fd(red) + PQ → Fd(ox) + PQH₂ (4 H⁺)</span>
         </div>
