@@ -15,15 +15,11 @@
   --text-primary: #e2e8f0;
   --text-secondary: #94a3b8;
   --text-muted: #64748b;
-  --accent-cyan: #22d3ee;
-  --accent-teal: #14b8a6;
-  --accent-gold: #fbbf24;
-  --accent-amber: #f59e0b;
-  --accent-green: #34d399;
-  --accent-rose: #fb7185;
-  --accent-purple: #a78bfa;
-  --accent-lime: #a3e635;
+  --accent-blue: #38bdf8;
+  --accent-green: #10b981;
   --accent-orange: #fb923c;
+  --accent-purple: #c084fc;
+  --accent-red: #f43f5e;
   --font-display: 'Outfit', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
   --radius: 12px;
@@ -97,8 +93,8 @@ body.light-mode .metabolite-card {
 }
 
 body.light-mode .metabolite-card.atp {
-  background: rgba(16, 185, 129, 0.1);
-  border-color: rgba(16, 185, 129, 0.3);
+  background: rgba(249, 115, 22, 0.1);
+  border-color: rgba(249, 115, 22, 0.3);
 }
 
 body.light-mode .metabolite-card.nadh {
@@ -107,8 +103,8 @@ body.light-mode .metabolite-card.nadh {
 }
 
 body.light-mode .metabolite-card.nadph {
-  background: rgba(217, 119, 6, 0.1);
-  border-color: rgba(217, 119, 6, 0.3);
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.3);
 }
 
 /* ===== HEADER ===== */
@@ -619,18 +615,18 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 #atp-bar {
-  background: var(--accent-green);
-  box-shadow: 0 0 5px rgba(52, 211, 153, 0.5);
+  background: var(--accent-orange);
+  box-shadow: 0 0 5px rgba(251, 146, 60, 0.5);
 }
 
 #nadh-bar {
-  background: var(--accent-cyan);
-  box-shadow: 0 0 5px rgba(34, 211, 238, 0.5);
+  background: var(--accent-blue);
+  box-shadow: 0 0 5px rgba(56, 189, 248, 0.5);
 }
 
 #nadph-bar {
-  background: var(--accent-gold);
-  box-shadow: 0 0 5px rgba(251, 191, 36, 0.5);
+  background: var(--accent-green);
+  box-shadow: 0 0 5px rgba(16, 185, 129, 0.5);
 }
 
 body.light-mode .ratio-bar-container {
@@ -654,30 +650,31 @@ body.light-mode .ratio-bar-container {
 }
 
 .metabolite-card.atp {
-  background: rgba(52, 211, 153, 0.08);
-  border-color: rgba(52, 211, 153, 0.2);
+  background: rgba(251, 146, 60, 0.08);
+  border-color: rgba(251, 146, 60, 0.2);
 }
 
 .metabolite-card.atp .metabolite-value {
-  color: var(--accent-green);
+  color: var(--accent-orange);
 }
 
 .metabolite-card.nadh {
-  background: rgba(34, 211, 238, 0.08);
-  border-color: rgba(34, 211, 238, 0.2);
+  background: rgba(56, 189, 248, 0.08);
+  /* Blue */
+  border-color: rgba(56, 189, 248, 0.2);
 }
 
 .metabolite-card.nadh .metabolite-value {
-  color: var(--accent-cyan);
+  color: var(--accent-blue);
 }
 
 .metabolite-card.nadph {
-  background: rgba(251, 191, 36, 0.08);
-  border-color: rgba(251, 191, 36, 0.2);
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.2);
 }
 
 .metabolite-card.nadph .metabolite-value {
-  color: var(--accent-gold);
+  color: var(--accent-green);
 }
 
 .metabolite-card.fadh2 {
@@ -708,21 +705,22 @@ body.light-mode .ratio-bar-container {
 }
 
 .metabolite-card.glucose-card {
-  background: rgba(163, 230, 53, 0.08);
-  border-color: rgba(163, 230, 53, 0.2);
+  background: rgba(16, 185, 129, 0.08);
+  /* Green */
+  border-color: rgba(16, 185, 129, 0.2);
 }
 
 .metabolite-card.glucose-card .metabolite-value {
-  color: var(--accent-lime);
+  color: var(--accent-green);
 }
 
 .metabolite-card.g3p-card {
-  background: rgba(52, 211, 153, 0.06);
-  border-color: rgba(52, 211, 153, 0.15);
+  background: rgba(16, 185, 129, 0.06);
+  border-color: rgba(16, 185, 129, 0.15);
 }
 
 .metabolite-card.g3p-card .metabolite-value {
-  color: #6ee7b7;
+  color: var(--accent-green);
 }
 
 .metabolite-card.co2-card {
@@ -776,7 +774,7 @@ body.light-mode .ratio-bar-container {
   font-family: var(--font-mono);
   font-weight: 600;
   font-size: 0.72rem;
-  color: var(--accent-teal);
+  color: var(--accent-orange);
   margin-bottom: 0.1rem;
 }
 
@@ -809,7 +807,7 @@ body.light-mode .ratio-bar-container {
 }
 
 .krebs-turn-counter span {
-  color: var(--accent-cyan);
+  color: var(--accent-blue);
   font-weight: 600;
 }
 
@@ -850,19 +848,27 @@ body.light-mode .ratio-bar-container {
 }
 
 .krebs-eq .pw-name {
-  color: var(--accent-cyan);
+  color: var(--accent-blue);
 }
 
 .ppp-eq .pw-name {
-  color: #818cf8;
+  color: var(--accent-purple);
 }
 
-.etc-eq .pw-name {
-  color: var(--accent-teal);
+.oxphos-eq .pw-name {
+  color: var(--accent-blue);
+}
+
+.light-eq .pw-name {
+  color: var(--accent-green);
+}
+
+.cyclic-eq .pw-name {
+  color: var(--accent-purple);
 }
 
 .ferment-eq .pw-name {
-  color: #fbbf24;
+  color: var(--accent-red);
 }
 
 /* ===== LEGEND ===== */
@@ -887,15 +893,15 @@ body.light-mode .ratio-bar-container {
 }
 
 .legend-dot.respiratory {
-  background: var(--accent-cyan);
+  background: var(--accent-blue);
 }
 
 .legend-dot.photosynthetic {
-  background: var(--accent-gold);
+  background: var(--accent-green);
 }
 
 .legend-dot.shared {
-  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-gold));
+  background: var(--accent-orange);
 }
 
 .legend-dot.calvin-dot {
@@ -907,19 +913,19 @@ body.light-mode .ratio-bar-container {
 }
 
 .legend-dot.cyclic-dot {
-  background: #c084fc;
+  background: var(--accent-purple);
 }
 
 .legend-dot.ppp-dot {
-  background: #818cf8;
+  background: var(--accent-purple);
 }
 
 .legend-dot.br-dot {
-  background: #e879f9;
+  background: var(--accent-purple);
 }
 
 .legend-dot.ferment-dot {
-  background: #fbbf24;
+  background: var(--accent-red);
 }
 
 .legend-dot.electron {

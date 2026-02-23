@@ -9,6 +9,7 @@
         time: 0, speed: 1, lightOn: true, oxygenAvailable: true, fermenting: false,
         glycolysisEnabled: true, pppEnabled: true, calvinEnabled: true, krebsEnabled: true,
         oxphosEnabled: true, linearLightEnabled: true, cyclicLightEnabled: true,
+        autoPlay: false,
         store: null // will reference the store object for renderer highlighting
     };
 
@@ -17,7 +18,7 @@
         atp: 5, nadh: 0, nadph: 0, fadh2: 0,
         totalAtpAdp: 20, totalNad: 20, totalNadp: 20,
         // Active tracking
-        protonGradient: 0, protonsPumped: 0, o2Produced: 0, o2Consumed: 0, h2oSplit: 0, electronsTransferred: 0, co2Fixed: 0,
+        protonGradient: 0, protonsPumped: 0, o2Produced: 0, o2Consumed: 0, h2oSplit: 0, electronsTransferred: 0, co2Fixed: 0, co2Produced: 0,
 
         // --- Metabolite Pools ---
         // Glycolysis / Gluconeogenesis
@@ -40,6 +41,7 @@
         pppToggle: document.getElementById('ppp-toggle'),
         calvinToggle: document.getElementById('calvin-toggle'),
         krebsToggle: document.getElementById('krebs-toggle'),
+        autoplayToggle: document.getElementById('autoplay-toggle'),
         resetBtn: document.getElementById('reset-btn'),
         // Ratio Bars
         atpBar: document.getElementById('atp-bar'), atpRatio: document.getElementById('atp-ratio'),
@@ -49,7 +51,7 @@
         protonGradient: document.getElementById('proton-gradient'),
         protonsPumped: document.getElementById('protons-pumped'), o2Produced: document.getElementById('o2-produced'),
         o2Consumed: document.getElementById('o2-consumed'), h2oSplit: document.getElementById('h2o-split'),
-        electronsTransferred: document.getElementById('electrons-transferred'),
+        electronsTransferred: document.getElementById('electrons-transferred'), co2Fixed: document.getElementById('co2-fixed'), co2Produced: document.getElementById('co2-produced'),
         // Active Step
         krebsEnzyme: document.getElementById('krebs-enzyme'), krebsReaction: document.getElementById('krebs-reaction'),
         krebsYield: document.getElementById('krebs-yield'), krebsTurn: document.getElementById('krebs-turn'),
@@ -72,6 +74,7 @@
     dom.pppToggle.addEventListener('change', () => simState.pppEnabled = dom.pppToggle.checked);
     dom.calvinToggle.addEventListener('change', () => simState.calvinEnabled = dom.calvinToggle.checked);
     dom.krebsToggle.addEventListener('change', () => simState.krebsEnabled = dom.krebsToggle.checked);
+    if (dom.autoplayToggle) dom.autoplayToggle.addEventListener('change', () => simState.autoPlay = dom.autoplayToggle.checked);
     dom.resetBtn.addEventListener('click', resetSimulation);
 
     function resetSimulation() {
@@ -312,8 +315,8 @@
         else if (idx === 2) { // 6PGDH -> R5P
             if (store.pga6 > 0 && store.nadph < store.totalNadp) {
                 let t = Math.min(store.pga6, store.totalNadp - store.nadph, 2);
-                store.pga6 -= t; store.r5p += t; store.nadph += t; store.co2Fixed -= t; // arbitrary tracking
-                showActiveStep('6PGDH', '6-PGA → R5P + NADPH', { nadph: t });
+                store.pga6 -= t; store.r5p += t; store.nadph += t; store.co2Produced += t;
+                showActiveStep('6PGDH', '6-PGA → R5P + CO₂ + NADPH', { nadph: t });
                 return true;
             }
         }
@@ -323,8 +326,8 @@
     function advancePDH() {
         if (!simState.oxygenAvailable) return false;
         if (store.pyruvate >= 2 && store.nadh <= store.totalNad - 2) {
-            store.pyruvate -= 2; store.acetylCoA += 2; store.nadh += 2;
-            showActiveStep('Pyruvate DH', '2× Pyruvate → 2× Acetyl-CoA + 2NADH', { nadh: 2 });
+            store.pyruvate -= 2; store.acetylCoA += 2; store.nadh += 2; store.co2Produced += 2;
+            showActiveStep('Pyruvate DH', '2× Pyruvate → 2× Acetyl-CoA + 2CO₂ + 2NADH', { nadh: 2 });
             return true;
         }
         return false;
@@ -347,16 +350,16 @@
         else if (idx === 2) { // IDH
             if (store.isocitrate > 0 && store.nadh < store.totalNad) {
                 let t = Math.min(store.isocitrate, store.totalNad - store.nadh, 2);
-                store.isocitrate -= t; store.akg += t; store.nadh += t;
-                showActiveStep('Isocitrate DH', 'Isocitrate → α-KG + NADH', { nadh: t });
+                store.isocitrate -= t; store.akg += t; store.nadh += t; store.co2Produced += t;
+                showActiveStep('Isocitrate DH', 'Isocitrate → α-KG + CO₂ + NADH', { nadh: t });
                 return true;
             }
         }
         else if (idx === 3) { // KGDH
             if (store.akg > 0 && store.nadh < store.totalNad) {
                 let t = Math.min(store.akg, store.totalNad - store.nadh, 2);
-                store.akg -= t; store.succoa += t; store.nadh += t;
-                showActiveStep('α-KGDH', 'α-KG → Succinyl-CoA + NADH', { nadh: t });
+                store.akg -= t; store.succoa += t; store.nadh += t; store.co2Produced += t;
+                showActiveStep('α-KGDH', 'α-KG → Succinyl-CoA + CO₂ + NADH', { nadh: t });
                 return true;
             }
         }
@@ -408,9 +411,9 @@
 
     function advanceFermentation() {
         if (simState.oxygenAvailable || store.pyruvate < 2 || store.nadh < 2) return false;
-        store.pyruvate -= 2; store.nadh -= 2; store.ethanol += 2;
+        store.pyruvate -= 2; store.nadh -= 2; store.ethanol += 2; store.co2Produced += 2;
         simState.fermenting = true;
-        showActiveStep('PDC/ADH', '2× Pyruvate + 2NADH → 2× Ethanol + 2NAD⁺', null);
+        showActiveStep('PDC/ADH', '2× Pyruvate + 2NADH → 2× Ethanol + 2CO₂ + 2NAD⁺', null);
         return true;
     }
 
@@ -423,16 +426,16 @@
             if (src) {
                 store.electronsTransferred += 2;
                 Renderer.spawnElectron(src, 'pq', 'resp');
-                setTimeout(() => { Renderer.spawnElectron('pq', 'cytb6f', 'resp'); pumpProtons(2, 'cytb6f'); }, 300);
+                setTimeout(() => { Renderer.spawnElectron('pq', 'cytb6f', 'resp'); pumpProtons(4, 'cytb6f'); }, 300);
                 setTimeout(() => { Renderer.spawnElectron('cytb6f', 'cytOx', 'resp'); pumpProtons(2, 'cytOx'); store.o2Consumed += 0.5; }, 600);
                 return true;
             }
         } else if (pathway === 'etc_photo') {
             if (!simState.lightOn || !simState.linearLightEnabled) return false;
             store.h2oSplit++; store.o2Produced += 0.5; store.electronsTransferred += 2;
-            pumpProtons(4, 'psii');
+            pumpProtons(2, 'psii');
             Renderer.spawnElectron('psii', 'pq', 'photo');
-            setTimeout(() => { Renderer.spawnElectron('pq', 'cytb6f', 'photo'); pumpProtons(2, 'cytb6f'); }, 250);
+            setTimeout(() => { Renderer.spawnElectron('pq', 'cytb6f', 'photo'); pumpProtons(4, 'cytb6f'); }, 250);
             setTimeout(() => Renderer.spawnElectron('cytb6f', 'pc', 'photo'), 500);
             setTimeout(() => Renderer.spawnElectron('pc', 'psi', 'photo'), 750);
             setTimeout(() => Renderer.spawnElectron('psi', 'fd', 'photo'), 1000);
@@ -445,7 +448,7 @@
             if (!simState.lightOn || !simState.cyclicLightEnabled) return false;
             store.electronsTransferred += 2;
             Renderer.spawnElectron('fd', 'pq', 'cyclic');
-            setTimeout(() => { Renderer.spawnElectron('pq', 'cytb6f', 'cyclic'); pumpProtons(2, 'cytb6f'); }, 350);
+            setTimeout(() => { Renderer.spawnElectron('pq', 'cytb6f', 'cyclic'); pumpProtons(4, 'cytb6f'); }, 350);
             setTimeout(() => Renderer.spawnElectron('cytb6f', 'pc', 'cyclic'), 700);
             setTimeout(() => Renderer.spawnElectron('pc', 'psi', 'cyclic'), 1000);
             return true;
@@ -477,6 +480,7 @@
         store.nadh += 3;
         store.fadh2++;
         store.atp++;
+        store.co2Produced += 2;
         krebsTurns++;
         dom.krebsTurn.textContent = krebsTurns;
         showActiveStep('Krebs Cycle (Full)', 'Acetyl-CoA → 2 CO₂ + 3 NADH + FADH₂ + ATP', { nadh: 3, fadh2: 1, atp: 1 });
@@ -513,7 +517,7 @@
         store.g6p--;
         store.nadph += 2;
         store.r5p++;
-        store.co2Fixed--;
+        store.co2Produced++;
         showActiveStep('PPP (Full)', 'G6P → R5P + CO₂ + 2 NADPH', { nadph: 2 });
         return true;
     }
@@ -531,15 +535,43 @@
         dom.protonsPumped.textContent = store.protonsPumped; dom.o2Produced.textContent = store.o2Produced.toFixed(1);
         dom.o2Consumed.textContent = store.o2Consumed.toFixed(1); dom.h2oSplit.textContent = store.h2oSplit;
         dom.electronsTransferred.textContent = store.electronsTransferred;
+        if (dom.co2Fixed) dom.co2Fixed.textContent = store.co2Fixed;
+        if (dom.co2Produced) dom.co2Produced.textContent = store.co2Produced;
     }
 
     /* ---- Render Loop ---- */
     let lastTime = performance.now();
+    let autoPlayTimer = 0;
     function mainLoop(now) {
         const dt = Math.min((now - lastTime) / 1000, 0.1);
         lastTime = now;
         simState.time += dt;
         simState.protonGradient = store.protonGradient;
+
+        // Auto-Play Logic
+        if (simState.autoPlay) {
+            autoPlayTimer += dt;
+            if (autoPlayTimer > 0.4) {
+                autoPlayTimer = 0;
+                // Attempt pathways in some logical priority
+                if (!advanceStep('atp_syn')) {
+                    if (!advanceStep('etc_resp')) {
+                        if (!advanceStep('etc_photo')) {
+                            if (!advanceStep('etc_cyclic')) {
+                                if (!advanceStep('run_krebs')) {
+                                    if (!advanceStep('run_glycolysis')) {
+                                        if (!advanceStep('run_calvin')) {
+                                            advanceStep('run_ppp');
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         Renderer.draw(simState);
         requestAnimationFrame(mainLoop);
     }
