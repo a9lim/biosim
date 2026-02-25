@@ -4,6 +4,11 @@
    R5P shared between PPP and Calvin, Calvin in cytoplasm
    =================================================================== */
 
+// Pre-computed constants for hot render paths (avoid per-frame allocations)
+const _TWO_X = new Set(['g3p', 'bpg', 'pga3', 'pga2', 'pep', 'pyruvate', 'acetylCoA', 'ethanol', 'acetaldehyde', 'aceticAcid']);
+const _KREBS_METABS = new Set(['acetylCoA', 'citrate', 'isocitrate', 'akg', 'succoa', 'succinate', 'fumarate', 'malate', 'oaa']);
+const _fadeCurve = (t) => t < 0.15 ? t / 0.15 : t > 0.85 ? (1 - t) / 0.15 : 1;
+
 const Renderer = {
     canvas: null, ctx: null, W: 0, H: 0, dpr: 1,
     zoom: 1, panX: 0, panY: 0,
@@ -31,6 +36,7 @@ const Renderer = {
     init(canvasEl) {
         this.canvas = canvasEl;
         this.ctx = canvasEl.getContext('2d');
+        this._zoomEl = document.getElementById('zoom-indicator');
         const R = EnzymeStyles.roleColors;
         this.pathwayColors = {
             glycolysis:   R.glycolysis.stroke,
@@ -42,7 +48,11 @@ const Renderer = {
             shared:       R.shared.stroke,
         };
         this.resize();
-        window.addEventListener('resize', () => this.resize());
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => this.resize(), 100);
+        });
         this.initZoomPan();
         this.initTouch();
     },
@@ -80,13 +90,7 @@ const Renderer = {
         c.addEventListener('wheel', (e) => {
             e.preventDefault();
             const rect = c.getBoundingClientRect();
-            const mx = e.clientX - rect.left, my = e.clientY - rect.top;
-            const oldZ = this.zoom;
-            this.zoom = Math.max(1.0, Math.min(3, this.zoom * (e.deltaY > 0 ? 0.92 : 1.08)));
-            this.panX = mx - (mx - this.panX) * (this.zoom / oldZ);
-            this.panY = my - (my - this.panY) * (this.zoom / oldZ);
-            this.clampPan();
-            document.getElementById('zoom-indicator').textContent = Math.round(this.zoom * 100) + '%';
+            this._applyZoom(this.zoom * (e.deltaY > 0 ? 0.92 : 1.08), e.clientX - rect.left, e.clientY - rect.top);
         }, { passive: false });
         c.addEventListener('mousedown', (e) => { if (e.button === 0) { this.isPanning = true; this.lastMX = e.clientX; this.lastMY = e.clientY; } });
         window.addEventListener('mousemove', (e) => {
@@ -163,14 +167,8 @@ const Renderer = {
                     y: (e.touches[0].clientY + e.touches[1].clientY) / 2
                 };
                 const rect = c.getBoundingClientRect();
-                const mx = mid.x - rect.left, my = mid.y - rect.top;
-                const oldZ = this.zoom;
-                this.zoom = Math.max(1.0, Math.min(3, this.zoom * (dist / touchStartDist)));
+                this._applyZoom(this.zoom * (dist / touchStartDist), mid.x - rect.left, mid.y - rect.top);
                 touchStartDist = dist;
-                this.panX = mx - (mx - this.panX) * (this.zoom / oldZ);
-                this.panY = my - (my - this.panY) * (this.zoom / oldZ);
-                this.clampPan();
-                document.getElementById('zoom-indicator').textContent = Math.round(this.zoom * 100) + '%';
             } else if (e.touches.length === 1) {
                 const dx = e.touches[0].clientX - touchStartX;
                 const dy = e.touches[0].clientY - touchStartY;
@@ -204,32 +202,17 @@ const Renderer = {
     },
 
     /* ---- Zoom button methods ---- */
-    zoomIn() {
-        const cx = this.W / 2, cy = this.H / 2;
+    _applyZoom(newZoom, cx, cy) {
         const oldZ = this.zoom;
-        this.zoom = Math.min(3, this.zoom * 1.25);
+        this.zoom = Math.max(1.0, Math.min(3, newZoom));
         this.panX = cx - (cx - this.panX) * (this.zoom / oldZ);
         this.panY = cy - (cy - this.panY) * (this.zoom / oldZ);
         this.clampPan();
-        document.getElementById('zoom-indicator').textContent = Math.round(this.zoom * 100) + '%';
+        this._zoomEl.textContent = Math.round(this.zoom * 100) + '%';
     },
-
-    zoomOut() {
-        const cx = this.W / 2, cy = this.H / 2;
-        const oldZ = this.zoom;
-        this.zoom = Math.max(1.0, this.zoom / 1.25);
-        this.panX = cx - (cx - this.panX) * (this.zoom / oldZ);
-        this.panY = cy - (cy - this.panY) * (this.zoom / oldZ);
-        this.clampPan();
-        document.getElementById('zoom-indicator').textContent = Math.round(this.zoom * 100) + '%';
-    },
-
-    resetZoom() {
-        this.zoom = 1;
-        this.panX = 0;
-        this.panY = 0;
-        document.getElementById('zoom-indicator').textContent = '100%';
-    },
+    zoomIn()    { this._applyZoom(this.zoom * 1.25, this.W / 2, this.H / 2); },
+    zoomOut()   { this._applyZoom(this.zoom / 1.25, this.W / 2, this.H / 2); },
+    resetZoom() { this.zoom = 1; this.panX = 0; this.panY = 0; this._zoomEl.textContent = '100%'; },
 
     computeLayout() {
         const W = this.W, H = this.H;
@@ -300,6 +283,7 @@ const Renderer = {
             malate: { cx: col(8), cy: r[3], label: 'Malate' },
             oaa: { cx: col(9), cy: r[3], label: 'OAA' },
         };
+        this._metabKeys = Object.keys(this.metab);
     },
 
     /* ==== MAIN DRAW ==== */
@@ -313,7 +297,7 @@ const Renderer = {
         ctx.translate(this.panX, this.panY);
         ctx.scale(this.zoom, this.zoom);
 
-        this.enzymeHitboxes = []; // reset each frame
+        this.enzymeHitboxes.length = 0; // reset each frame (reuse array)
         this.drawMembrane(ctx, lm, state.time);
         this.drawETCChain(ctx, state, lm);
         this.drawCytoplasmNetwork(ctx, state, lm);
@@ -372,7 +356,7 @@ const Renderer = {
         if (rA > 0.01) {
             ctx.save(); ctx.globalAlpha = rA;
             EnzymeStyles.drawArrow(ctx, c.ndh1.cx + cxW / 2 + 2, c.ndh1.cy, c.pq.cx - 27, c.pq.cy, respC, rA);
-            EnzymeStyles.drawArrow(ctx, c.sdh.cx + 12, c.sdh.cy - 8, c.pq.cx - 27, c.pq.cy + 4, respC, rA);
+            EnzymeStyles.drawArrow(ctx, c.sdh.cx + 12, c.sdh.cy - 8, c.pq.cx - 27, c.pq.cy + 7, respC, rA);
             EnzymeStyles.drawArrow(ctx, c.pc.cx + sR + 2, c.pc.cy + 4, c.cytOx.cx - cxW / 2 - 2, c.cytOx.cy - 4, respC, rA);
             ctx.restore();
         }
@@ -388,14 +372,14 @@ const Renderer = {
         // ── Photosynthetic chain arrows (green) ──
         if (phA > 0.01) {
             ctx.save(); ctx.globalAlpha = phA;
-            EnzymeStyles.drawArrow(ctx, c.psii.cx + cxW / 2 + 2, c.psii.cy, c.pq.cx - 27, c.pq.cy - 2, photoC, phA);
+            EnzymeStyles.drawArrow(ctx, c.psii.cx + cxW / 2 + 2, c.psii.cy, c.pq.cx - 27, c.pq.cy - 7, photoC, phA);
             EnzymeStyles.drawArrow(ctx, c.pc.cx + sR + 2, c.pc.cy + 2, c.psi.cx - cxW / 2 - 2, c.psi.cy - 6, photoC, phA);
             EnzymeStyles.drawArrow(ctx, c.psi.cx + cxW / 2 + 2, c.psi.cy - 6, c.fd.cx - sR - 2, c.fd.cy + 2, photoC, phA);
             if (state.linearLightEnabled) EnzymeStyles.drawArrow(ctx, c.fd.cx + sR + 2, c.fd.cy, c.fnr.cx - 27, c.fnr.cy, photoC, phA);
             if (state.cyclicLightEnabled) {
                 const cStartX = c.fd.cx - sR - 2, cStartY = c.fd.cy;
                 const cEndX = c.pq.cx + 27, cEndY = c.pq.cy;
-                const cCpx = (cStartX + cEndX) / 2, cCpy = this.membraneY - 40;
+                const cCpx = (cStartX + cEndX) / 2, cCpy = this.membraneY - 20;
                 EnzymeStyles._drawArrowCore(ctx, cStartX, cStartY, cEndX, cEndY, { color: cyclicC, alpha: phA, curved: true, cpx: cCpx, cpy: cCpy });
             }
             ctx.restore();
@@ -445,38 +429,13 @@ const Renderer = {
         ctx.restore();
 
         const atpGlow = state.protonGradient > 0 ? pulse : 0;
-        EnzymeStyles.drawATPSynthase(ctx, c.atpSyn.cx, c.atpSyn.cy, cxW + 4, cxH * 0.8, state.time * 2, atpGlow, lm, state.store ? state.store.protonGradient : 0);
+        EnzymeStyles.drawATPSynthase(ctx, c.atpSyn.cx, c.atpSyn.cy, cxW + 4, cxH * 0.8, atpGlow, lm);
 
         ctx.save(); ctx.globalAlpha = phA;
         EnzymeStyles.drawBR(ctx, c.br.cx, c.br.cy, cxW - 4, cxH * 0.6, phA > 0.5 ? 5 + 3 * Math.sin(t * 4) : 0, lm);
         if (phA > 0.01) this.drawSmallProtonArrow(ctx, c.br.cx, c.br.cy - cxH * 0.6 / 2 - 18, '1H⁺');
         ctx.restore();
 
-        // ── Redraw arrowheads on top of complexes so they're always visible ──
-        const _ah = (x1,y1,x2,y2,col,a) => {
-            const angle = Math.atan2(y2-y1, x2-x1);
-            EnzymeStyles._arrowhead(ctx, x2, y2, angle, col, a);
-        };
-        if (rA > 0.01) {
-            _ah(c.ndh1.cx + cxW/2 + 2, c.ndh1.cy, c.pq.cx - 27, c.pq.cy, respC, rA);
-            _ah(c.sdh.cx + 12, c.sdh.cy - 8, c.pq.cx - 27, c.pq.cy + 4, respC, rA);
-            _ah(c.pc.cx + sR + 2, c.pc.cy + 4, c.cytOx.cx - cxW/2 - 2, c.cytOx.cy - 4, respC, rA);
-        }
-        if (shA > 0.01) {
-            _ah(c.pq.cx + 27, c.pq.cy, c.cytb6f.cx - cxW/2 - 2, c.cytb6f.cy, sharedC, shA);
-            _ah(c.cytb6f.cx + cxW/2 + 2, c.cytb6f.cy - 6, c.pc.cx - sR - 2, c.pc.cy + 4, sharedC, shA);
-        }
-        if (phA > 0.01) {
-            _ah(c.psii.cx + cxW/2 + 2, c.psii.cy, c.pq.cx - 27, c.pq.cy - 2, photoC, phA);
-            _ah(c.pc.cx + sR + 2, c.pc.cy + 2, c.psi.cx - cxW/2 - 2, c.psi.cy - 6, photoC, phA);
-            _ah(c.psi.cx + cxW/2 + 2, c.psi.cy - 6, c.fd.cx - sR - 2, c.fd.cy + 2, photoC, phA);
-            if (state.linearLightEnabled) _ah(c.fd.cx + sR + 2, c.fd.cy, c.fnr.cx - 27, c.fnr.cy, photoC, phA);
-            if (state.cyclicLightEnabled) {
-                const cEndX = c.pq.cx + 27, cEndY = c.pq.cy;
-                const cCpx = (c.fd.cx - sR - 2 + cEndX) / 2, cCpy = this.membraneY - 40;
-                EnzymeStyles._arrowhead(ctx, cEndX, cEndY, Math.atan2(cEndY - cCpy, cEndX - cCpx), cyclicC, phA);
-            }
-        }
 
         // Yield labels: moved inside synced alpha blocks to dim instead of disappearing
         ctx.font = '600 11px IBM Plex Mono,monospace'; ctx.textAlign = 'center';
@@ -496,7 +455,12 @@ const Renderer = {
         ctx.fillText('-½O₂', c.cytOx.cx, c.cytOx.cy + cxH * 0.4 / 2 + 12);
         ctx.restore();
 
-        ctx.fillStyle = sharedC; ctx.fillText('+ATP', c.atpSyn.cx, c.atpSyn.cy + cxH * 0.8 / 2 + 12);
+        // ATP Synthase: downward 4H⁺ arrow (protons flowing through to make ATP) + +ATP label below
+        const atpBotY = c.atpSyn.cy + cxH * 0.8 / 2;
+        this.drawSmallProtonArrow(ctx, c.atpSyn.cx, atpBotY + 3, '4H⁺', 'down');
+        ctx.font = '600 11px IBM Plex Mono,monospace';
+        ctx.fillStyle = sharedC; ctx.textAlign = 'center';
+        ctx.fillText('+ATP', c.atpSyn.cx, atpBotY + 47);
 
         // ETC hitboxes for click-to-react
         if (rA > 0.1) {
@@ -509,16 +473,27 @@ const Renderer = {
         this.enzymeHitboxes.push({ cx: c.psi.cx, cy: c.psi.cy, w: cxW + 10, h: cxH + 10, pathway: 'etc_cyclic', stepIndex: 0 });
     },
 
-    drawSmallProtonArrow(ctx, x, y, label) {
+    drawSmallProtonArrow(ctx, x, y, label, dir = 'up') {
         const protonC = EnzymeStyles.roleColors.proton.stroke;
         const parentAlpha = ctx.globalAlpha;
         ctx.save();
-        ctx.beginPath(); ctx.moveTo(x, y + 14); ctx.lineTo(x, y);
-        ctx.strokeStyle = protonC; ctx.globalAlpha = 0.5 * parentAlpha; ctx.lineWidth = 2.5; ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x, y - 3); ctx.lineTo(x - 5, y + 3); ctx.lineTo(x + 5, y + 3); ctx.closePath();
-        ctx.fillStyle = protonC; ctx.globalAlpha = parentAlpha; ctx.fill();
-        ctx.font = '700 11px IBM Plex Mono,monospace'; ctx.fillStyle = protonC;
-        ctx.textAlign = 'center'; ctx.fillText(label, x, y - 7);
+        ctx.strokeStyle = protonC; ctx.lineWidth = 2.5;
+        ctx.font = '700 11px IBM Plex Mono,monospace'; ctx.fillStyle = protonC; ctx.textAlign = 'center';
+        if (dir === 'down') {
+            // y = top anchor; line goes down, arrowhead at bottom, label below tip
+            ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y + 14);
+            ctx.globalAlpha = parentAlpha; ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(x, y + 17); ctx.lineTo(x - 5, y + 11); ctx.lineTo(x + 5, y + 11); ctx.closePath();
+            ctx.globalAlpha = parentAlpha; ctx.fill();
+            ctx.fillText(label, x, y + 28);
+        } else {
+            // y = arrowhead tip; line goes down from y+14, tip at y
+            ctx.beginPath(); ctx.moveTo(x, y + 14); ctx.lineTo(x, y);
+            ctx.globalAlpha = parentAlpha; ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(x, y - 3); ctx.lineTo(x - 5, y + 3); ctx.lineTo(x + 5, y + 3); ctx.closePath();
+            ctx.globalAlpha = parentAlpha; ctx.fill();
+            ctx.fillText(label, x, y - 7);
+        }
         ctx.restore();
     },
 
@@ -775,8 +750,7 @@ const Renderer = {
         // METABOLITE NODES (drawn last, on top)
         // ══════════════════════════════════════════════════
         ctx.font = '600 9px IBM Plex Mono, monospace';
-        const twoXMolecules = ['g3p', 'bpg', 'pga3', 'pga2', 'pep', 'pyruvate', 'acetylCoA', 'ethanol', 'acetaldehyde', 'aceticAcid'];
-        for (const key of Object.keys(m)) {
+        for (const key of this._metabKeys) {
             const mA = this.getMetabAlpha(key, gA, cA, pA, kA, state);
             if (mA > 0.01) {
                 const count = state.store ? (state.store[key] || 0) : 0;
@@ -797,7 +771,7 @@ const Renderer = {
                     ctx.scale(pulseScale, pulseScale);
                     ctx.translate(-m[key].cx, -m[key].cy);
                 }
-                EnzymeStyles.drawMetaboliteNode(ctx, m[key].cx, m[key].cy, m[key].label, this.isMetabActive(key, state), lm, twoXMolecules.includes(key), count);
+                EnzymeStyles.drawMetaboliteNode(ctx, m[key].cx, m[key].cy, m[key].label, this.isMetabActive(key, state), lm, _TWO_X.has(key), count);
                 ctx.restore();
             }
         }
@@ -823,9 +797,7 @@ const Renderer = {
         if (key === 'pgl6' || key === 'pga6') return pA;
         if (key === 'r5p') return Math.max(pA, cA);
         if (key === 'rubp') return cA;
-        if (['acetylCoA', 'citrate', 'isocitrate', 'akg', 'succoa', 'succinate', 'fumarate', 'malate', 'oaa'].includes(key)) {
-            return kA;
-        }
+        if (_KREBS_METABS.has(key)) return kA;
         return 1;
     },
 
@@ -834,75 +806,63 @@ const Renderer = {
         return state.store[key] > 0;
     },
 
-    /** Single unidirectional enzyme arrow — stores hitbox */
-    drawEnzymeArrow(ctx, from, to, enzyme, color, active, pathway, stepIndex) {
-        // Respect context alpha for disabled states, but stay opaque (1.0) when idle/active
-        const a = ctx.globalAlpha < 1.0 ? ctx.globalAlpha : 1.0;
+    /** Compute padded arrow endpoints between two metabolite nodes (shared by all arrow helpers).
+     *  Returns false if nodes overlap; otherwise mutates this._ep and returns true. */
+    _ep: { x1: 0, y1: 0, x2: 0, y2: 0, nx: 0, ny: 0 },
+    _calcEndpoints(from, to) {
         const dx = to.cx - from.cx, dy = to.cy - from.cy;
-        const len = Math.sqrt(dx * dx + dy * dy); if (len < 1) return;
+        const len = Math.sqrt(dx * dx + dy * dy);
+        if (len < 1) return false;
         const nx = dx / len, ny = dy / len;
         const pad = Math.min(36, 1.0 / Math.sqrt((nx / 28) ** 2 + (ny / 14) ** 2) + 8);
-        const x1 = from.cx + nx * pad, y1 = from.cy + ny * pad;
-        const x2 = to.cx - nx * pad, y2 = to.cy - ny * pad;
-        EnzymeStyles.drawArrow(ctx, x1, y1, x2, y2, color, a);
-        if (enzyme) {
-            const tagX = (x1 + x2) / 2, tagY = (y1 + y2) / 2 - 6;
-            const lm = this._currentLightMode || false;
-            EnzymeStyles.drawEnzymeTag(ctx, tagX, tagY, enzyme, color, active, lm);
-            if (pathway !== undefined) {
-                this.enzymeHitboxes.push({ cx: tagX, cy: tagY, w: 40, h: 14, pathway, stepIndex });
-            }
+        const ep = this._ep;
+        ep.x1 = from.cx + nx * pad; ep.y1 = from.cy + ny * pad;
+        ep.x2 = to.cx - nx * pad;   ep.y2 = to.cy - ny * pad;
+        ep.nx = nx; ep.ny = ny;
+        return true;
+    },
+
+    /** Attach enzyme tag + hitbox at a point */
+    _tagAndHitbox(ctx, tagX, tagY, enzyme, color, active, pathway, stepIndex, color2) {
+        EnzymeStyles.drawEnzymeTag(ctx, tagX, tagY, enzyme, color, active, this._currentLightMode || false, color2);
+        if (pathway !== undefined) {
+            this.enzymeHitboxes.push({ cx: tagX, cy: tagY, w: 40, h: 14, pathway, stepIndex });
         }
+    },
+
+    /** Single unidirectional enzyme arrow — stores hitbox */
+    drawEnzymeArrow(ctx, from, to, enzyme, color, active, pathway, stepIndex) {
+        if (!this._calcEndpoints(from, to)) return;
+        const { x1, y1, x2, y2 } = this._ep;
+        EnzymeStyles.drawArrow(ctx, x1, y1, x2, y2, color, ctx.globalAlpha);
+        if (enzyme) this._tagAndHitbox(ctx, (x1 + x2) / 2, (y1 + y2) / 2 - 6, enzyme, color, active, pathway, stepIndex);
     },
 
     /** Curved unidirectional arrow — stores hitbox */
     drawEnzymeCurvedArrow(ctx, from, to, enzyme, color, active, dir, off, pathway, stepIndex) {
-        const a = ctx.globalAlpha < 1.0 ? ctx.globalAlpha : 1.0;
-        const dx = to.cx - from.cx, dy = to.cy - from.cy;
-        const len = Math.sqrt(dx * dx + dy * dy); if (len < 1) return;
-        const nx = dx / len, ny = dy / len;
-        const pad = Math.min(36, 1.0 / Math.sqrt((nx / 28) ** 2 + (ny / 14) ** 2) + 8);
-        const x1 = from.cx + nx * pad, y1 = from.cy + ny * pad;
-        const x2 = to.cx - nx * pad, y2 = to.cy - ny * pad;
-        EnzymeStyles.drawCurvedArrow(ctx, x1, y1, x2, y2, color, a, dir || 1);
+        if (!this._calcEndpoints(from, to)) return;
+        const { x1, y1, x2, y2, nx, ny } = this._ep;
+        const d = dir || 1;
+        EnzymeStyles.drawCurvedArrow(ctx, x1, y1, x2, y2, color, ctx.globalAlpha, d);
         if (enzyme) {
             const o = off || 0;
-            const tagX = (x1 + x2) / 2 + o * (dir || 1) * (-ny);
-            const tagY = (y1 + y2) / 2 - 6 + o * (dir || 1) * nx;
-            const lm = this._currentLightMode || false;
-            EnzymeStyles.drawEnzymeTag(ctx, tagX, tagY, enzyme, color, active, lm);
-            if (pathway !== undefined) {
-                this.enzymeHitboxes.push({ cx: tagX, cy: tagY, w: 40, h: 14, pathway, stepIndex });
-            }
+            this._tagAndHitbox(ctx, (x1 + x2) / 2 + o * d * (-ny), (y1 + y2) / 2 - 6 + o * d * nx, enzyme, color, active, pathway, stepIndex);
         }
     },
 
     /** Bidirectional arrow for shared reversible enzymes — stores hitbox */
     drawBidirArrow(ctx, nodeA, nodeB, enzyme, colorA, colorB, active, pathway, stepIndex) {
-        const a = ctx.globalAlpha;
-        const dx = nodeB.cx - nodeA.cx, dy = nodeB.cy - nodeA.cy;
-        const len = Math.sqrt(dx * dx + dy * dy); if (len < 1) return;
-        const nx = dx / len, ny = dy / len;
-        const pad = Math.min(36, 1.0 / Math.sqrt((nx / 28) ** 2 + (ny / 14) ** 2) + 8);
-        const x1 = nodeA.cx + nx * pad, y1 = nodeA.cy + ny * pad;
-        const x2 = nodeB.cx - nx * pad, y2 = nodeB.cy - ny * pad;
-        EnzymeStyles.drawBidirectionalArrow(ctx, x1, y1, x2, y2, colorA, colorB, a);
+        if (!this._calcEndpoints(nodeA, nodeB)) return;
+        const { x1, y1, x2, y2 } = this._ep;
+        EnzymeStyles.drawBidirectionalArrow(ctx, x1, y1, x2, y2, colorA, colorB, ctx.globalAlpha);
         const mx = (x1 + x2) / 2, my = (y1 + y2) / 2 - 6;
-        const lm = this._currentLightMode || false;
-        EnzymeStyles.drawEnzymeTag(ctx, mx, my, enzyme, colorA, active, lm, colorB);
-        if (enzyme && pathway !== undefined) {
-            this.enzymeHitboxes.push({ cx: mx, cy: my, w: 40, h: 14, pathway, stepIndex });
-        }
+        if (enzyme) this._tagAndHitbox(ctx, mx, my, enzyme, colorA, active, pathway, stepIndex, colorB);
     },
 
     drawYieldBadge(ctx, node, active, text, color) {
         if (!active) return;
         ctx.font = '600 10px IBM Plex Mono, monospace'; ctx.fillStyle = color;
         ctx.textAlign = 'center'; ctx.fillText(text, node.cx, node.cy + 18);
-    },
-
-    fillArrowhead(ctx, x, y, angle, color, alpha) {
-        EnzymeStyles._arrowhead(ctx, x, y, angle, color, alpha);
     },
 
     /* ---- KREBS CYCLE (UNROLLED) ---- */
@@ -952,8 +912,6 @@ const Renderer = {
         ctx.restore();
     },
 
-    getKrebsYield(s) { switch (s) { case 2: return '+NADH +CO₂'; case 3: return '+NADH +CO₂'; case 4: return '+ATP'; case 5: return '+FADH₂'; case 7: return '+NADH'; default: return null; } },
-
     drawFloatLabel(ctx, x, y, text, color) {
         ctx.save();
         ctx.font = '600 11px IBM Plex Mono, monospace';
@@ -985,11 +943,14 @@ const Renderer = {
     spawnElectron(fk, tk, tp) {
         const f = this.etcComplexes[fk], t = this.etcComplexes[tk];
         if (!f || !t) return;
+        const type = tp || 'resp';
+        const R = EnzymeStyles.roleColors;
+        const rgb = type === 'photo' ? R.electronPhoto.rgb : type === 'cyclic' ? R.electronCyclic.rgb : R.electronResp.rgb;
         this.electrons.push({
             x: f.cx, y: f.cy, tx: t.cx, ty: t.cy,
             progress: 0, speed: 0.025,
-            type: tp || 'resp',
-            trail: Anim.trail(10)
+            type, trail: Anim.trail(10),
+            _trailColor: `rgba(${rgb},0.5)`
         });
     },
     spawnProton(cx, dir) {
@@ -1012,67 +973,52 @@ const Renderer = {
     },
 
     drawParticles(ctx, state) {
-        // Smooth fade: ramp in over first 15%, ramp out over last 15%
-        const fadeCurve = (t) => {
-            if (t < 0.15) return t / 0.15;
-            if (t > 0.85) return (1 - t) / 0.15;
-            return 1;
-        };
+        const spd = state.speed;
 
         // Electrons with glow trails
         for (let i = this.electrons.length - 1; i >= 0; i--) {
             const e = this.electrons[i];
-            e.progress += e.speed * state.speed;
+            e.progress += e.speed * spd;
             if (e.progress >= 1) { this.electrons.splice(i, 1); continue; }
             const t = e.progress;
             const px = e.x + (e.tx - e.x) * t;
             const py = e.y + (e.ty - e.y) * t + Math.sin(t * Math.PI * 3) * 3;
-            const intensity = 1 - Math.abs(t - 0.5) * 2;
-            const fade = fadeCurve(t);
 
-            // Trail afterglow
             if (e.trail) {
                 e.trail.push(px, py);
-                const R = EnzymeStyles.roleColors;
-                const tc = e.type === 'photo' ? `rgba(${R.electronPhoto.rgb},0.5)`
-                         : e.type === 'cyclic' ? `rgba(${R.electronCyclic.rgb},0.5)`
-                         : `rgba(${R.electronResp.rgb},0.5)`;
-                e.trail.draw(ctx, 3, tc);
+                e.trail.draw(ctx, 3, e._trailColor);
             }
 
-            EnzymeStyles.drawElectron(ctx, px, py, intensity, e.type, fade);
+            EnzymeStyles.drawElectron(ctx, px, py, 1 - Math.abs(t - 0.5) * 2, e.type, _fadeCurve(t));
         }
         // Protons
         for (let i = this.protons.length - 1; i >= 0; i--) {
             const p = this.protons[i];
-            p.progress += p.speed * state.speed;
+            p.progress += p.speed * spd;
             if (p.progress >= 1) { this.protons.splice(i, 1); continue; }
             const t = p.progress;
-            const fade = fadeCurve(t);
             EnzymeStyles.drawProton(ctx,
                 p.x + Math.sin(t * Math.PI * 2) * 2,
                 p.y + (p.ty - p.y) * t,
                 1 - Math.abs(t - 0.5) * 2,
-                fade);
+                _fadeCurve(t));
         }
-        // Photons
+        // Photons (manual alpha management avoids save/restore per particle)
         for (let i = this.photons.length - 1; i >= 0; i--) {
             const ph = this.photons[i];
-            ph.progress += ph.speed * state.speed;
+            ph.progress += ph.speed * spd;
             if (ph.progress >= 1) { this.photons.splice(i, 1); continue; }
             const t = ph.progress;
-            const px = ph.x + (ph.tx - ph.x) * t;
-            const py = ph.y + (ph.ty - ph.y) * t;
             const fade = t < 0.3 ? t / 0.3 : (t > 0.7 ? (1 - t) / 0.3 : 1);
-            ctx.save();
             ctx.globalAlpha = fade * 0.9;
             ctx.beginPath();
-            ctx.arc(px, py, 3, 0, Math.PI * 2);
+            ctx.arc(ph.x + (ph.tx - ph.x) * t, ph.y + (ph.ty - ph.y) * t, 3, 0, Math.PI * 2);
             ctx.fillStyle = '#fde68a';
             ctx.shadowColor = '#fbbf24';
             ctx.shadowBlur = 12;
             ctx.fill();
-            ctx.restore();
         }
+        ctx.shadowBlur = 0;
+        ctx.globalAlpha = 1;
     },
 };
