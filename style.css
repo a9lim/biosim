@@ -27,7 +27,7 @@
   --text-secondary: #94a3b8;
   --text-muted: #64748b;
 
-  /* Pathway accents — matched to canvas _BASE colors */
+  /* Base accents */
   --accent-orange: #fb923c;
   --accent-blue: #38bdf8;
   --accent-green: #10b981;
@@ -38,6 +38,30 @@
   --accent-gold: #fbbf24;
   --accent-rose: #fb7185;
   --accent-amber: #f59e0b;
+
+  /* Pathway colors — change here to recolor a pathway everywhere in the UI */
+  --pw-glycolysis: var(--accent-blue);
+  --pw-glycolysis-rgb: 56, 189, 248;
+  --pw-krebs: var(--accent-red);
+  --pw-krebs-rgb: 244, 63, 94;
+  --pw-calvin: var(--accent-green);
+  --pw-calvin-rgb: 16, 185, 129;
+  --pw-ppp: var(--accent-orange);
+  --pw-ppp-rgb: 251, 146, 60;
+  --pw-cyclic: var(--accent-purple);
+  --pw-cyclic-rgb: 192, 132, 252;
+  --pw-fermentation: #c49058;
+  --pw-fermentation-rgb: 196, 144, 88;
+
+  /* Cofactor colors — distinct from pathway colors to avoid sidebar confusion */
+  --co-atp: var(--accent-gold);
+  --co-atp-rgb: 251, 191, 36;
+  --co-nadh: var(--accent-cyan);
+  --co-nadh-rgb: 34, 211, 238;
+  --co-nadph: var(--accent-teal);
+  --co-nadph-rgb: 20, 184, 166;
+  --co-fadh2: var(--accent-rose);
+  --co-fadh2-rgb: 251, 113, 133;
 
   /* Typography */
   --font-display: 'Figtree', system-ui, sans-serif;
@@ -158,23 +182,23 @@ body.light-mode .metabolite-card {
 }
 
 body.light-mode .metabolite-card.atp {
-  background: rgba(249, 115, 22, 0.08);
-  border-color: rgba(249, 115, 22, 0.25);
+  background: rgba(var(--co-atp-rgb), 0.08);
+  border-color: rgba(var(--co-atp-rgb), 0.25);
 }
 
 body.light-mode .metabolite-card.nadh {
-  background: rgba(56, 189, 248, 0.08);
-  border-color: rgba(56, 189, 248, 0.25);
+  background: rgba(var(--co-nadh-rgb), 0.08);
+  border-color: rgba(var(--co-nadh-rgb), 0.25);
 }
 
 body.light-mode .metabolite-card.nadph {
-  background: rgba(16, 185, 129, 0.08);
-  border-color: rgba(16, 185, 129, 0.25);
+  background: rgba(var(--co-nadph-rgb), 0.08);
+  border-color: rgba(var(--co-nadph-rgb), 0.25);
 }
 
 body.light-mode .metabolite-card.fadh2 {
-  background: rgba(192, 132, 252, 0.08);
-  border-color: rgba(192, 132, 252, 0.25);
+  background: rgba(var(--co-fadh2-rgb), 0.08);
+  border-color: rgba(var(--co-fadh2-rgb), 0.25);
 }
 
 body.light-mode .ratio-bar-container {
@@ -226,43 +250,43 @@ body.light-mode #oxygen-toggle:checked+.toggle-o2 .toggle-knob {
 }
 
 body.light-mode #glyc-toggle:checked+.toggle-glyc {
-  background: linear-gradient(135deg, #fb923c, #ea580c);
-  border-color: rgba(234, 88, 12, 0.4);
+  background: linear-gradient(135deg, var(--pw-glycolysis), color-mix(in srgb, var(--pw-glycolysis), black 30%));
+  border-color: rgba(var(--pw-glycolysis-rgb), 0.4);
 }
 
 body.light-mode #glyc-toggle:checked+.toggle-glyc .toggle-knob {
   background: #fff;
-  box-shadow: 0 0 6px rgba(251, 146, 60, 0.5);
+  box-shadow: 0 0 6px rgba(var(--pw-glycolysis-rgb), 0.5);
 }
 
 body.light-mode #ppp-toggle:checked+.toggle-ppp {
-  background: linear-gradient(135deg, #a78bfa, #7c3aed);
-  border-color: rgba(124, 58, 237, 0.4);
+  background: linear-gradient(135deg, var(--pw-ppp), color-mix(in srgb, var(--pw-ppp), black 30%));
+  border-color: rgba(var(--pw-ppp-rgb), 0.4);
 }
 
 body.light-mode #ppp-toggle:checked+.toggle-ppp .toggle-knob {
   background: #fff;
-  box-shadow: 0 0 6px rgba(167, 139, 250, 0.5);
+  box-shadow: 0 0 6px rgba(var(--pw-ppp-rgb), 0.5);
 }
 
 body.light-mode #calvin-toggle:checked+.toggle-calvin {
-  background: linear-gradient(135deg, #34d399, #059669);
-  border-color: rgba(5, 150, 105, 0.4);
+  background: linear-gradient(135deg, var(--pw-calvin), color-mix(in srgb, var(--pw-calvin), black 30%));
+  border-color: rgba(var(--pw-calvin-rgb), 0.4);
 }
 
 body.light-mode #calvin-toggle:checked+.toggle-calvin .toggle-knob {
   background: #fff;
-  box-shadow: 0 0 6px rgba(52, 211, 153, 0.5);
+  box-shadow: 0 0 6px rgba(var(--pw-calvin-rgb), 0.5);
 }
 
 body.light-mode #krebs-toggle:checked+.toggle-krebs {
-  background: linear-gradient(135deg, #38bdf8, #0284c7);
-  border-color: rgba(2, 132, 199, 0.4);
+  background: linear-gradient(135deg, var(--pw-krebs), color-mix(in srgb, var(--pw-krebs), black 30%));
+  border-color: rgba(var(--pw-krebs-rgb), 0.4);
 }
 
 body.light-mode #krebs-toggle:checked+.toggle-krebs .toggle-knob {
   background: #fff;
-  box-shadow: 0 0 6px rgba(56, 189, 248, 0.5);
+  box-shadow: 0 0 6px rgba(var(--pw-krebs-rgb), 0.5);
 }
 
 /* ===== HEADER ===== */
@@ -579,53 +603,53 @@ main {
 .toggle-glyc { background: #1e293b; }
 
 #glyc-toggle:checked+.toggle-glyc {
-  background: linear-gradient(135deg, #431407, #7c2d12);
-  border-color: rgba(251, 146, 60, 0.3);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--pw-glycolysis), black 85%), color-mix(in srgb, var(--pw-glycolysis), black 75%));
+  border-color: rgba(var(--pw-glycolysis-rgb), 0.3);
 }
 
 #glyc-toggle:checked+.toggle-glyc .toggle-knob {
   transform: translateX(22px);
-  background: var(--accent-orange);
-  box-shadow: 0 0 6px rgba(251, 146, 60, 0.4);
+  background: var(--pw-glycolysis);
+  box-shadow: 0 0 6px rgba(var(--pw-glycolysis-rgb), 0.4);
 }
 
 .toggle-ppp { background: #1e293b; }
 
 #ppp-toggle:checked+.toggle-ppp {
-  background: linear-gradient(135deg, #1e1b4b, #312e81);
-  border-color: rgba(192, 132, 252, 0.3);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--pw-ppp), black 85%), color-mix(in srgb, var(--pw-ppp), black 75%));
+  border-color: rgba(var(--pw-ppp-rgb), 0.3);
 }
 
 #ppp-toggle:checked+.toggle-ppp .toggle-knob {
   transform: translateX(22px);
-  background: var(--accent-purple);
-  box-shadow: 0 0 6px rgba(192, 132, 252, 0.4);
+  background: var(--pw-ppp);
+  box-shadow: 0 0 6px rgba(var(--pw-ppp-rgb), 0.4);
 }
 
 .toggle-calvin { background: #1e293b; }
 
 #calvin-toggle:checked+.toggle-calvin {
-  background: linear-gradient(135deg, #022c22, #064e3b);
-  border-color: rgba(52, 211, 153, 0.3);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--pw-calvin), black 85%), color-mix(in srgb, var(--pw-calvin), black 75%));
+  border-color: rgba(var(--pw-calvin-rgb), 0.3);
 }
 
 #calvin-toggle:checked+.toggle-calvin .toggle-knob {
   transform: translateX(22px);
-  background: var(--accent-green);
-  box-shadow: 0 0 6px rgba(52, 211, 153, 0.4);
+  background: var(--pw-calvin);
+  box-shadow: 0 0 6px rgba(var(--pw-calvin-rgb), 0.4);
 }
 
 .toggle-krebs { background: #1e293b; }
 
 #krebs-toggle:checked+.toggle-krebs {
-  background: linear-gradient(135deg, #082f49, #0c4a6e);
-  border-color: rgba(56, 189, 248, 0.3);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--pw-krebs), black 85%), color-mix(in srgb, var(--pw-krebs), black 75%));
+  border-color: rgba(var(--pw-krebs-rgb), 0.3);
 }
 
 #krebs-toggle:checked+.toggle-krebs .toggle-knob {
   transform: translateX(22px);
-  background: var(--accent-blue);
-  box-shadow: 0 0 6px rgba(56, 189, 248, 0.4);
+  background: var(--pw-krebs);
+  box-shadow: 0 0 6px rgba(var(--pw-krebs-rgb), 0.4);
 }
 
 /* ===== BUTTONS ===== */
@@ -719,23 +743,23 @@ main {
 }
 
 #atp-bar {
-  background: linear-gradient(90deg, #f59e0b, #fb923c);
-  box-shadow: 0 0 4px rgba(245, 158, 11, 0.4);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--co-atp), black 20%), var(--co-atp));
+  box-shadow: 0 0 4px rgba(var(--co-atp-rgb), 0.4);
 }
 
 #nadh-bar {
-  background: linear-gradient(90deg, #0ea5e9, #38bdf8);
-  box-shadow: 0 0 4px rgba(56, 189, 248, 0.4);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--co-nadh), black 20%), var(--co-nadh));
+  box-shadow: 0 0 4px rgba(var(--co-nadh-rgb), 0.4);
 }
 
 #nadph-bar {
-  background: linear-gradient(90deg, #059669, #10b981);
-  box-shadow: 0 0 4px rgba(16, 185, 129, 0.4);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--co-nadph), black 20%), var(--co-nadph));
+  box-shadow: 0 0 4px rgba(var(--co-nadph-rgb), 0.4);
 }
 
 #fadh2-bar {
-  background: linear-gradient(90deg, #8b5cf6, #a78bfa);
-  box-shadow: 0 0 4px rgba(167, 139, 250, 0.4);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--co-fadh2), black 20%), var(--co-fadh2));
+  box-shadow: 0 0 4px rgba(var(--co-fadh2-rgb), 0.4);
 }
 
 .metabolite-value {
@@ -749,32 +773,32 @@ main {
 }
 
 .metabolite-card.atp {
-  background: rgba(251, 146, 60, 0.06);
-  border-color: rgba(251, 146, 60, 0.15);
+  background: rgba(var(--co-atp-rgb), 0.06);
+  border-color: rgba(var(--co-atp-rgb), 0.15);
 }
 
-.metabolite-card.atp .metabolite-value { color: var(--accent-orange); }
+.metabolite-card.atp .metabolite-value { color: var(--co-atp); }
 
 .metabolite-card.nadh {
-  background: rgba(56, 189, 248, 0.06);
-  border-color: rgba(56, 189, 248, 0.15);
+  background: rgba(var(--co-nadh-rgb), 0.06);
+  border-color: rgba(var(--co-nadh-rgb), 0.15);
 }
 
-.metabolite-card.nadh .metabolite-value { color: var(--accent-blue); }
+.metabolite-card.nadh .metabolite-value { color: var(--co-nadh); }
 
 .metabolite-card.nadph {
-  background: rgba(16, 185, 129, 0.06);
-  border-color: rgba(16, 185, 129, 0.15);
+  background: rgba(var(--co-nadph-rgb), 0.06);
+  border-color: rgba(var(--co-nadph-rgb), 0.15);
 }
 
-.metabolite-card.nadph .metabolite-value { color: var(--accent-green); }
+.metabolite-card.nadph .metabolite-value { color: var(--co-nadph); }
 
 .metabolite-card.fadh2 {
-  background: rgba(192, 132, 252, 0.06);
-  border-color: rgba(192, 132, 252, 0.15);
+  background: rgba(var(--co-fadh2-rgb), 0.06);
+  border-color: rgba(var(--co-fadh2-rgb), 0.15);
 }
 
-.metabolite-card.fadh2 .metabolite-value { color: var(--accent-purple); }
+.metabolite-card.fadh2 .metabolite-value { color: var(--co-fadh2); }
 
 /* ===== STAT ROWS ===== */
 .stat-row {
@@ -813,7 +837,7 @@ main {
   font-family: var(--font-mono);
   font-weight: 600;
   font-size: clamp(0.76rem, 1.15vw, 0.88rem);
-  color: var(--accent-orange);
+  color: var(--accent-red);
   margin-bottom: 0.12rem;
 }
 
@@ -845,10 +869,10 @@ main {
   border-top: none;
 }
 
-.krebs-turn-counter span {
-  color: var(--accent-blue);
-  font-weight: 600;
-}
+.krebs-turn-counter .counter-krebs { color: var(--pw-krebs); font-weight: 600; }
+.krebs-turn-counter .counter-calvin { color: var(--pw-calvin); font-weight: 600; }
+.krebs-turn-counter .counter-glycolysis { color: var(--pw-glycolysis); font-weight: 600; }
+.krebs-turn-counter .counter-ppp { color: var(--pw-ppp); font-weight: 600; }
 
 /* ===== PATHWAY NET EQUATIONS ===== */
 .pathway-eq {
@@ -876,14 +900,14 @@ main {
   line-height: 1.25;
 }
 
-.glycolysis-eq .pw-name { color: var(--accent-orange); }
-.calvin-eq .pw-name { color: var(--accent-green); }
-.krebs-eq .pw-name { color: var(--accent-blue); }
-.ppp-eq .pw-name { color: var(--accent-purple); }
-.oxphos-eq .pw-name { color: var(--accent-blue); }
-.light-eq .pw-name { color: var(--accent-green); }
-.cyclic-eq .pw-name { color: var(--accent-purple); }
-.ferment-eq .pw-name { color: var(--accent-red); }
+.glycolysis-eq .pw-name { color: var(--pw-glycolysis); }
+.calvin-eq .pw-name { color: var(--pw-calvin); }
+.krebs-eq .pw-name { color: var(--pw-krebs); }
+.ppp-eq .pw-name { color: var(--pw-ppp); }
+.oxphos-eq .pw-name { color: var(--pw-krebs); }
+.light-eq .pw-name { color: var(--pw-calvin); }
+.cyclic-eq .pw-name { color: var(--pw-cyclic); }
+.ferment-eq .pw-name { color: var(--pw-fermentation); }
 
 /* ===== LEGEND ===== */
 .legend-item {
@@ -904,15 +928,15 @@ main {
   flex-shrink: 0;
 }
 
-.legend-dot.respiratory { background: var(--accent-blue); }
-.legend-dot.photosynthetic { background: var(--accent-green); }
-.legend-dot.shared { background: var(--accent-orange); }
-.legend-dot.calvin-dot { background: var(--accent-green); }
-.legend-dot.glycolysis-dot { background: var(--accent-orange); }
-.legend-dot.cyclic-dot { background: var(--accent-purple); }
-.legend-dot.ppp-dot { background: var(--accent-purple); }
-.legend-dot.br-dot { background: var(--accent-purple); }
-.legend-dot.ferment-dot { background: var(--accent-red); }
+.legend-dot.respiratory { background: var(--pw-krebs); }
+.legend-dot.photosynthetic { background: var(--pw-calvin); }
+.legend-dot.shared { background: var(--pw-glycolysis); }
+.legend-dot.calvin-dot { background: var(--pw-calvin); }
+.legend-dot.glycolysis-dot { background: var(--pw-glycolysis); }
+.legend-dot.cyclic-dot { background: var(--pw-cyclic); }
+.legend-dot.ppp-dot { background: var(--pw-ppp); }
+.legend-dot.br-dot { background: var(--pw-cyclic); }
+.legend-dot.ferment-dot { background: var(--pw-fermentation); }
 
 .legend-dot.electron {
   background: #67e8f9;
@@ -922,6 +946,11 @@ main {
 .legend-dot.proton {
   background: var(--accent-rose);
   box-shadow: 0 0 4px rgba(251, 113, 133, 0.4);
+}
+
+.legend-dot.photon {
+  background: #fde68a;
+  box-shadow: 0 0 4px rgba(251, 191, 36, 0.5);
 }
 
 /* ===== SPEED SLIDER (kept for potential future use) ===== */

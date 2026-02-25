@@ -29,6 +29,21 @@ const _BASE = {
   green:  { stroke: '#10b981', strokeLight: '#059669', rgb: '16,185,129' },
   purple: { stroke: '#c084fc', strokeLight: '#9333ea', rgb: '192,132,252' },
   rose:   { stroke: '#f43f5e', strokeLight: '#e11d48', rgb: '244,63,94' },
+  brown:  { stroke: '#c49058', strokeLight: '#9a6b30', rgb: '196,144,88' },
+};
+
+// ---------- Semantic Role → Base Family ----------
+// Change a role's color here and it propagates everywhere
+const _ROLE = {
+  glycolysis: _BASE.blue, calvin: _BASE.green, ppp: _BASE.orange,
+  krebs: _BASE.rose, fermentation: _BASE.brown,
+  respiratory: _BASE.rose, photosynthetic: _BASE.green,
+  shared: _BASE.blue, atpSynthase: _BASE.blue,
+  cyclic: _BASE.purple, bacteriorhodopsin: _BASE.purple,
+  link: _BASE.blue,
+  electronResp: _BASE.rose, electronPhoto: _BASE.green, electronCyclic: _BASE.purple,
+  proton: _BASE.rose,
+  lightIndicator: _BASE.orange,
 };
 
 function _pal(b, fill, glowA) {
@@ -37,23 +52,24 @@ function _pal(b, fill, glowA) {
 
 const EnzymeStyles = {
   baseColors: _BASE,
+  roleColors: _ROLE,
 
   colors: {
-    respiratory:        _pal(_BASE.blue,   '#164e63', 0.35),
-    photosynthetic:     _pal(_BASE.green,  '#064e3b', 0.35),
-    shared:             _pal(_BASE.orange, '#431407', 0.3),
-    atpSynthase:        _pal(_BASE.orange, '#431407', 0.35),
-    glycolysis:         _pal(_BASE.orange, '#431407', 0.3),
-    glycolysisActive:   _pal(_BASE.orange, '#7c2d12', 0.5),
-    krebs:              _pal(_BASE.blue,   '#082f49', 0.25),
-    krebsActive:        _pal(_BASE.blue,   '#0c4a6e', 0.5),
-    calvin:             _pal(_BASE.green,  '#052e16', 0.3),
-    calvinActive:       _pal(_BASE.green,  '#064e3b', 0.5),
-    ppp:                _pal(_BASE.purple, '#1e1b4b', 0.25),
-    pppActive:          _pal(_BASE.purple, '#312e81', 0.5),
-    bacteriorhodopsin:  _pal(_BASE.purple, '#4a1942', 0.35),
-    cyclic:             _pal(_BASE.purple, '#3b0764', 0.35),
-    fermentation:       _pal(_BASE.rose,   '#4c0519', 0.3),
+    respiratory:        _pal(_ROLE.respiratory,      '#4c0519', 0.35),
+    photosynthetic:     _pal(_ROLE.photosynthetic,   '#064e3b', 0.35),
+    shared:             _pal(_ROLE.shared,           '#082f49', 0.3),
+    atpSynthase:        _pal(_ROLE.atpSynthase,      '#082f49', 0.35),
+    glycolysis:         _pal(_ROLE.glycolysis,       '#082f49', 0.3),
+    glycolysisActive:   _pal(_ROLE.glycolysis,       '#0c4a6e', 0.5),
+    krebs:              _pal(_ROLE.krebs,            '#4c0519', 0.25),
+    krebsActive:        _pal(_ROLE.krebs,            '#881337', 0.5),
+    calvin:             _pal(_ROLE.calvin,           '#052e16', 0.3),
+    calvinActive:       _pal(_ROLE.calvin,           '#064e3b', 0.5),
+    ppp:                _pal(_ROLE.ppp,              '#1e1b4b', 0.25),
+    pppActive:          _pal(_ROLE.ppp,              '#312e81', 0.5),
+    bacteriorhodopsin:  _pal(_ROLE.bacteriorhodopsin,'#4a1942', 0.35),
+    cyclic:             _pal(_ROLE.cyclic,           '#3b0764', 0.35),
+    fermentation:       _pal(_ROLE.fermentation,     '#431407', 0.3),
     membrane:           { fill: 'rgba(30,58,95,0.6)', stroke: 'rgba(56,189,248,0.15)' },
   },
 
@@ -198,8 +214,8 @@ const EnzymeStyles = {
     this._drawETCComplex(ctx, cx, cy, w, h, glow, lightMode, 'photosynthetic', 'PSII', 'P680');
     // Chlorophyll P680 chromophore (centered in protein)
     ctx.beginPath();
-    ctx.arc(cx, cy, 3, 0, Math.PI * 2);
-    ctx.fillStyle = lightMode ? `rgba(${_BASE.green.rgb},0.5)` : `rgba(${_BASE.green.rgb},0.4)`;
+    ctx.arc(cx, cy, 7, 0, Math.PI * 2);
+    ctx.fillStyle = lightMode ? `rgba(${_ROLE.photosynthetic.rgb},0.6)` : `rgba(${_ROLE.photosynthetic.rgb},0.5)`;
     ctx.fill();
   },
 
@@ -207,8 +223,8 @@ const EnzymeStyles = {
     this._drawETCComplex(ctx, cx, cy, w, h, glow, lightMode, 'photosynthetic', 'PSI', 'P700');
     // Chlorophyll P700 chromophore (centered in protein)
     ctx.beginPath();
-    ctx.arc(cx, cy, 3, 0, Math.PI * 2);
-    ctx.fillStyle = lightMode ? `rgba(${_BASE.green.rgb},0.5)` : `rgba(${_BASE.green.rgb},0.4)`;
+    ctx.arc(cx, cy, 7, 0, Math.PI * 2);
+    ctx.fillStyle = lightMode ? `rgba(${_ROLE.photosynthetic.rgb},0.6)` : `rgba(${_ROLE.photosynthetic.rgb},0.5)`;
     ctx.fill();
   },
 
@@ -221,7 +237,7 @@ const EnzymeStyles = {
   },
 
   drawPC(ctx, cx, cy, radius, glow, lightMode) {
-    this._drawETCComplex(ctx, cx, cy, radius * 2, radius * 2, glow, lightMode, 'photosynthetic', 'PC');
+    this._drawETCComplex(ctx, cx, cy, radius * 2, radius * 2, glow, lightMode, 'shared', 'PC');
   },
 
   drawFd(ctx, cx, cy, radius, glow, lightMode) {
@@ -244,8 +260,8 @@ const EnzymeStyles = {
     this._drawETCComplex(ctx, cx, cy, w, h, glow, lightMode, 'bacteriorhodopsin', 'BR');
     // Retinal chromophore (centered in protein)
     ctx.beginPath();
-    ctx.arc(cx, cy, 3, 0, Math.PI * 2);
-    ctx.fillStyle = lightMode ? `rgba(${_BASE.purple.rgb},0.5)` : `rgba(${_BASE.purple.rgb},0.4)`;
+    ctx.arc(cx, cy, 7, 0, Math.PI * 2);
+    ctx.fillStyle = lightMode ? `rgba(${_ROLE.bacteriorhodopsin.rgb},0.6)` : `rgba(${_ROLE.bacteriorhodopsin.rgb},0.5)`;
     ctx.fill();
   },
 
@@ -333,7 +349,7 @@ const EnzymeStyles = {
     }
     if (show2x) {
       ctx.font = '700 9px IBM Plex Mono, monospace';
-      ctx.fillStyle = lightMode ? _BASE.rose.strokeLight : _BASE.rose.stroke;
+      ctx.fillStyle = lightMode ? '#64748b' : '#94a3b8';
       ctx.fillText('2x', cx, cy + 17);
     }
   },
@@ -441,9 +457,9 @@ const EnzymeStyles = {
 
   /* ---- Particles ---- */
   drawElectron(ctx, x, y, intensity, type, fade) {
-    const rgb = type === 'photo' ? _BASE.green.rgb
-              : type === 'cyclic' ? _BASE.purple.rgb
-              : _BASE.blue.rgb;
+    const rgb = type === 'photo' ? _ROLE.electronPhoto.rgb
+              : type === 'cyclic' ? _ROLE.electronCyclic.rgb
+              : _ROLE.electronResp.rgb;
     const a = fade != null ? fade : 1;
     ctx.save();
     ctx.globalAlpha = a;
@@ -463,8 +479,8 @@ const EnzymeStyles = {
     ctx.globalAlpha = a;
     ctx.beginPath();
     ctx.arc(x, y, CFG.protonRadius, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(${_BASE.rose.rgb},${0.6 + 0.4 * intensity})`;
-    ctx.shadowColor = `rgba(${_BASE.rose.rgb},0.7)`;
+    ctx.fillStyle = `rgba(${_ROLE.proton.rgb},${0.6 + 0.4 * intensity})`;
+    ctx.shadowColor = `rgba(${_ROLE.proton.rgb},0.7)`;
     ctx.shadowBlur = 5 * intensity;
     ctx.fill();
     ctx.shadowBlur = 0;
@@ -483,7 +499,7 @@ const EnzymeStyles = {
     ctx.save();
     const o = opts || {};
     const a = o.alpha != null ? o.alpha : 1.0;
-    const c = o.color || _BASE.blue.stroke;
+    const c = o.color || _ROLE.shared.stroke;
     const hl = CFG.arrowHeadLen, ha = CFG.arrowHeadAngle, gap = CFG.arrowStopGap;
 
     let angle;
@@ -573,7 +589,7 @@ const EnzymeStyles = {
 
     ctx.strokeStyle = color;
     ctx.lineWidth = CFG.cycleStrokeWidth;
-    ctx.globalAlpha = 0.8 * parentAlpha;
+    ctx.globalAlpha = parentAlpha;
     ctx.stroke();
 
     // Tangential arrowhead

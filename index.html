@@ -196,10 +196,10 @@
           <div class="step-yield" id="krebs-yield">—</div>
         </div>
         <div class="krebs-turn-counter">
-          Krebs Turns: <span id="krebs-turn">0</span> · Calvin Turns: <span id="calvin-turn">0</span>
+          Krebs Turns: <span id="krebs-turn" class="counter-krebs">0</span> · Calvin Turns: <span id="calvin-turn" class="counter-calvin">0</span>
         </div>
         <div class="krebs-turn-counter">
-          Glycolysis Runs: <span id="glycolysis-run">0</span> · PPP Runs: <span id="ppp-run">0</span>
+          Glycolysis Runs: <span id="glycolysis-run" class="counter-glycolysis">0</span> · PPP Runs: <span id="ppp-run" class="counter-ppp">0</span>
         </div>
       </div>
 
@@ -211,32 +211,36 @@
           <span class="pw-eq">Glc → 2 Pyr + 2 ATP + 2 NADH</span>
         </div>
         <div class="pathway-eq calvin-eq">
-          <span class="pw-name">Calvin</span>
-          <span class="pw-eq">6 CO₂ + 18 ATP + 12 NADPH → 2 G3P (×2)</span>
+          <span class="pw-name">Calvin ×6</span>
+          <span class="pw-eq">6 CO₂ + 18 ATP + 12 NADPH → 2 G3P</span>
         </div>
         <div class="pathway-eq krebs-eq">
-          <span class="pw-name">Krebs</span>
-          <span class="pw-eq">2 AcCoA → 4 CO₂ + 6 NADH + 2 FADH₂ + 2 ATP (×2)</span>
+          <span class="pw-name">Krebs ×2</span>
+          <span class="pw-eq">2 AcCoA → 4 CO₂ + 6 NADH + 2 FADH₂ + 2 ATP</span>
         </div>
         <div class="pathway-eq ppp-eq">
-          <span class="pw-name">PPP</span>
-          <span class="pw-eq">G6P → R5P + 2 NADPH + CO₂</span>
+          <span class="pw-name">PPP ×6</span>
+          <span class="pw-eq">G6P → 12 NADPH + 6 CO₂</span>
         </div>
         <div class="pathway-eq etc-eq oxphos-eq">
-          <span class="pw-name">Oxid. Phos.</span>
-          <span class="pw-eq">NADH + H⁺ + ½O₂ → NAD⁺ + H₂O (10 H⁺)</span>
+          <span class="pw-name">Oxid. Phos. (NADH)</span>
+          <span class="pw-eq">NADH + H⁺ + ½O₂ → H₂O (10 H⁺ ~ 2.5 ATP)</span>
+        </div>
+        <div class="pathway-eq etc-eq oxphos-eq">
+          <span class="pw-name">Oxid. Phos. (FADH₂)</span>
+          <span class="pw-eq">FADH₂ + ½O₂ → H₂O (6 H⁺ ~ 1.5 ATP)</span>
         </div>
         <div class="pathway-eq etc-eq light-eq">
           <span class="pw-name">Linear Light</span>
-          <span class="pw-eq">H₂O + NADP⁺ → ½O₂ + NADPH + H⁺ (6 H⁺)</span>
+          <span class="pw-eq">H₂O → ½O₂ + NADPH + H⁺ (6 H⁺ ~ 1.5 ATP)</span>
         </div>
         <div class="pathway-eq etc-eq cyclic-eq">
           <span class="pw-name">Cyclic Light</span>
-          <span class="pw-eq">Fd(red) + PQ → Fd(ox) + PQH₂ (4 H⁺)</span>
+          <span class="pw-eq">(4 H⁺ ~ 1 ATP)</span>
         </div>
         <div class="pathway-eq ferment-eq">
           <span class="pw-name">Fermentation</span>
-          <span class="pw-eq">Pyr + NADH → EtOH + CO₂ + NAD⁺</span>
+          <span class="pw-eq">2 Pyr + 2 NADH → 2 EtOH + 2 CO₂</span>
         </div>
       </div>
 
@@ -249,8 +253,9 @@
         <div class="legend-item"><span class="legend-dot ppp-dot"></span> Pentose phosphate pathway</div>
         <div class="legend-item"><span class="legend-dot cyclic-dot"></span> Cyclic e⁻ flow / Bacteriorhodopsin</div>
         <div class="legend-item"><span class="legend-dot ferment-dot"></span> Fermentation</div>
-        <div class="legend-item"><span class="legend-dot electron"></span> Electron particle</div>
-        <div class="legend-item"><span class="legend-dot proton"></span> H⁺ proton</div>
+        <div class="legend-item"><span class="legend-dot electron"></span> Electron (e⁻)</div>
+        <div class="legend-item"><span class="legend-dot proton"></span> Proton (H⁺)</div>
+        <div class="legend-item"><span class="legend-dot photon"></span> Photon </div>
       </div>
     </aside>
   </main>
