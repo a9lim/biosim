@@ -22,7 +22,7 @@ const CFG = {
 };
 
 // ---------- Base Color Groups ----------
-// Single source of truth — all pathway palettes derive from these five families
+// Single source of truth — all pathway palettes derive from these color families
 const _BASE = {
   orange: { stroke: '#fb923c', strokeLight: '#ea580c', rgb: '251,146,60' },
   blue:   { stroke: '#38bdf8', strokeLight: '#0284c7', rgb: '56,189,248' },
@@ -30,19 +30,20 @@ const _BASE = {
   purple: { stroke: '#c084fc', strokeLight: '#9333ea', rgb: '192,132,252' },
   rose:   { stroke: '#f43f5e', strokeLight: '#e11d48', rgb: '244,63,94' },
   brown:  { stroke: '#c49058', strokeLight: '#9a6b30', rgb: '196,144,88' },
+  red:    { stroke: '#ef4444', strokeLight: '#dc2626', rgb: '239,68,68' },
 };
 
 // ---------- Semantic Role → Base Family ----------
 // Change a role's color here and it propagates everywhere
 const _ROLE = {
-  glycolysis: _BASE.blue, calvin: _BASE.green, ppp: _BASE.rose,
-  krebs: _BASE.orange, fermentation: _BASE.brown,
-  respiratory: _BASE.orange, photosynthetic: _BASE.green,
-  shared: _BASE.blue, atpSynthase: _BASE.blue,
+  glycolysis: _BASE.orange, calvin: _BASE.green, ppp: _BASE.rose,
+  krebs: _BASE.blue, fermentation: _BASE.brown,
+  respiratory: _BASE.blue, photosynthetic: _BASE.green,
+  shared: _BASE.orange, atpSynthase: _BASE.orange,
   cyclic: _BASE.purple, bacteriorhodopsin: _BASE.purple,
-  link: _BASE.blue,
-  electronResp: _BASE.orange, electronPhoto: _BASE.green, electronCyclic: _BASE.purple,
-  proton: _BASE.orange,
+  link: _BASE.orange,
+  electronResp: _BASE.blue, electronPhoto: _BASE.green, electronCyclic: _BASE.purple,
+  proton: _BASE.red,
   lightIndicator: _BASE.orange,
 };
 
@@ -58,7 +59,7 @@ const EnzymeStyles = {
     respiratory:        _pal(_ROLE.respiratory,      '#4c0519', 0.35),
     photosynthetic:     _pal(_ROLE.photosynthetic,   '#064e3b', 0.35),
     shared:             _pal(_ROLE.shared,           '#082f49', 0.3),
-    atpSynthase:        _pal(_ROLE.atpSynthase,      '#082f49', 0.35),
+    atpSynthase:        _pal(_ROLE.atpSynthase,      '#3d1a00', 0.35),
     glycolysis:         _pal(_ROLE.glycolysis,       '#082f49', 0.3),
     glycolysisActive:   _pal(_ROLE.glycolysis,       '#0c4a6e', 0.5),
     krebs:              _pal(_ROLE.krebs,            '#4c0519', 0.25),
@@ -252,7 +253,7 @@ const EnzymeStyles = {
     this._drawETCComplex(ctx, cx, cy, w, h, glow, lightMode, 'shared', 'PQ');
   },
 
-  drawATPSynthase(ctx, cx, cy, w, h, rotation, glow, lightMode, protonGradient) {
+  drawATPSynthase(ctx, cx, cy, w, h, glow, lightMode) {
     this._drawETCComplex(ctx, cx, cy, w, h, glow, lightMode, 'atpSynthase', 'ATP', 'Syn');
   },
 

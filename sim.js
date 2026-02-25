@@ -145,37 +145,48 @@
     }
 
     /* ============================================================
-       REACTION LOGIC
+       REACTION LOGIC — dispatch map replaces if-else chain
        ============================================================ */
-    function advanceStep(pathway, stepIndex, direction) {
-        let ran = false;
-        if (pathway === 'glycolysis') ran = advanceGlycolysis(stepIndex, direction);
-        else if (pathway === 'calvin') ran = advanceCalvin(stepIndex, direction);
-        else if (pathway === 'ppp') ran = advancePPP(stepIndex, direction);
-        else if (pathway === 'krebs') ran = advanceKrebs(stepIndex, direction);
-        else if (pathway === 'pdh') ran = advancePDH();
-        else if (pathway === 'pdc') ran = advancePDC();
-        else if (pathway === 'adh') ran = advanceADH(direction);
-        else if (pathway === 'aldh') ran = advanceALDH();
-        else if (pathway === 'acs') ran = advanceACS();
-        else if (pathway === 'fermentation') ran = advanceFermentation();
-        else if (pathway === 'etc_resp' || pathway === 'etc_photo' || pathway === 'etc_cyclic') ran = advanceETC(pathway, stepIndex);
-        else if (pathway === 'run_krebs') ran = runKrebsCycle();
-        else if (pathway === 'run_calvin') ran = runCalvinCycle();
-        else if (pathway === 'run_ppp') ran = runPPPCycle();
-        else if (pathway === 'run_glycolysis_upper') ran = runGlycolysisUpper();
-        else if (pathway === 'run_glycolysis_lower') ran = runGlycolysisLower();
-        else if (pathway === 'atp_syn') ran = advanceATPSynthase();
-        else if (pathway === 'br') ran = advanceBacteriorhodopsin();
+    const _dispatch = {
+        glycolysis:             (i, d) => advanceGlycolysis(i, d),
+        calvin:                 (i, d) => advanceCalvin(i, d),
+        ppp:                    (i, d) => advancePPP(i, d),
+        krebs:                  (i, d) => advanceKrebs(i, d),
+        pdh:                    ()     => advancePDH(),
+        pdc:                    ()     => advancePDC(),
+        adh:                    (_i, d) => advanceADH(d),
+        aldh:                   ()     => advanceALDH(),
+        acs:                    ()     => advanceACS(),
+        fermentation:           ()     => advanceFermentation(),
+        etc_resp:               (i)    => advanceETC('etc_resp', i),
+        etc_photo:              (i)    => advanceETC('etc_photo', i),
+        etc_cyclic:             (i)    => advanceETC('etc_cyclic', i),
+        run_krebs:              ()     => runKrebsCycle(),
+        run_calvin:             ()     => runCalvinCycle(),
+        run_ppp:                ()     => runPPPCycle(),
+        run_glycolysis_upper:   ()     => runGlycolysisUpper(),
+        run_glycolysis_lower:   ()     => runGlycolysisLower(),
+        atp_syn:                ()     => advanceATPSynthase(),
+        br:                     ()     => advanceBacteriorhodopsin(),
+    };
 
-        // Nudge cycle rotations on successful reactions (smooth via targetAngle)
+    // Rotation nudges keyed by pathway (only for cycle-related pathways)
+    const _rotNudge = {
+        run_krebs:  { rot: 'krebsRot',  delta: -Math.PI * 2 },
+        krebs:      { rot: 'krebsRot',  delta: -0.4 },
+        run_calvin: { rot: 'calvinRot', delta:  Math.PI * 2 },
+        calvin:     { rot: 'calvinRot', delta:  0.4 },
+        run_ppp:    { rot: 'pppRot',    delta:  Math.PI * 2 },
+        ppp:        { rot: 'pppRot',    delta:  0.4 },
+    };
+
+    function advanceStep(pathway, stepIndex, direction) {
+        const handler = _dispatch[pathway];
+        const ran = handler ? handler(stepIndex, direction) : false;
+
         if (ran) {
-            if (pathway === 'run_krebs') simState.krebsRot.targetAngle -= Math.PI * 2;
-            else if (pathway === 'krebs') simState.krebsRot.targetAngle -= 0.4;
-            if (pathway === 'run_calvin') simState.calvinRot.targetAngle += Math.PI * 2;
-            else if (pathway === 'calvin') simState.calvinRot.targetAngle += 0.4;
-            if (pathway === 'run_ppp') simState.pppRot.targetAngle += Math.PI * 2;
-            else if (pathway === 'ppp') simState.pppRot.targetAngle += 0.4;
+            const nudge = _rotNudge[pathway];
+            if (nudge) simState[nudge.rot].targetAngle += nudge.delta;
         }
 
         updateDashboard();
@@ -569,7 +580,7 @@
         // 2 turns: 2 AcCoA + 2 OAA → 4 CO₂ + 6 NADH + 2 FADH₂ + 2 ATP (+ regenerate 2 OAA)
         if (!simState.oxygenAvailable || !simState.krebsEnabled || store.acetylCoA < 2 || store.oaa < 2 || store.totalNad - store.nadh < 6 || store.totalAtpAdp - store.atp < 2 || store.totalFad - store.fadh2 < 2) return false;
         store.acetylCoA -= 2;
-        store.oaa -= 2; store.oaa += 2;  // 2 consumed, 2 regenerated (net 0)
+        // OAA is consumed and regenerated (net 0) — no mutation needed
         store.nadh += 6;
         store.fadh2 = Math.min(store.fadh2 + 2, store.totalFad);
         store.atp += 2;
@@ -595,7 +606,7 @@
 
     function runPPPCycle() {
         if (!simState.pppEnabled || store.g6p < 6 || store.totalNadp - store.nadph < 12) return false;
-        store.g6p -= 6; store.g6p += 5;  // 6 consumed, 5 regenerated (net -1)
+        store.g6p--;  // 6 consumed, 5 regenerated (net -1)
         store.nadph += 12;
         store.co2Produced += 6;
         pppRuns++;

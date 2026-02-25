@@ -40,10 +40,10 @@
   --accent-amber: #f59e0b;
 
   /* Pathway colors — change here to recolor a pathway everywhere in the UI */
-  --pw-glycolysis: var(--accent-blue);
-  --pw-glycolysis-rgb: 56, 189, 248;
-  --pw-krebs: var(--accent-orange);
-  --pw-krebs-rgb: 251, 146, 60;
+  --pw-glycolysis: var(--accent-orange);
+  --pw-glycolysis-rgb: 251, 146, 60;
+  --pw-krebs: var(--accent-blue);
+  --pw-krebs-rgb: 56, 189, 248;
   --pw-calvin: var(--accent-green);
   --pw-calvin-rgb: 16, 185, 129;
   --pw-ppp: var(--accent-red);
@@ -204,10 +204,6 @@ body.light-mode .metabolite-card.fadh2 {
 body.light-mode .ratio-bar-container {
   background: rgba(0, 0, 0, 0.08);
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.06);
-}
-
-body.light-mode input[type="range"] {
-  background: #cbd5e1;
 }
 
 /* Light-mode zoom controls */
@@ -951,36 +947,6 @@ main {
 .legend-dot.photon {
   background: #fde68a;
   box-shadow: 0 0 4px rgba(251, 191, 36, 0.5);
-}
-
-/* ===== SPEED SLIDER (kept for potential future use) ===== */
-input[type="range"] {
-  -webkit-appearance: none;
-  appearance: none;
-  flex: 1;
-  margin: 0 5px;
-  height: 3px;
-  background: #1e293b;
-  border-radius: 2px;
-  outline: none;
-}
-
-input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 11px;
-  height: 11px;
-  border-radius: 50%;
-  background: var(--accent-teal);
-  cursor: pointer;
-  box-shadow: 0 0 4px rgba(20, 184, 166, 0.4);
-}
-
-#speed-value {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  color: var(--accent-teal);
-  min-width: 26px;
-  text-align: right;
 }
 
 /* ===== RESPONSIVE ===== */
