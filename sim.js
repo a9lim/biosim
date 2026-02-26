@@ -89,12 +89,11 @@
     const _themeTitles = ['Theme: Simulation', 'Theme: Light', 'Theme: Dark'];
 
     function updateTheme() {
-        let isLight;
-        if (themeMode === 0) isLight = simState.lightOn;
-        else if (themeMode === 1) isLight = true;
-        else isLight = false;
-        simState.visualLightMode = isLight;
-        document.body.classList.toggle('light-mode', isLight);
+        document.body.dataset.theme =
+            themeMode === 1 ? 'light' :
+            themeMode === 2 ? 'dark' :
+            simState.lightOn ? 'light' : 'dark';
+        simState.visualLightMode = document.body.dataset.theme === 'light';
         if (dom.themeBtn) {
             dom.themeBtn.setAttribute('data-theme', _themeNames[themeMode]);
             dom.themeBtn.title = _themeTitles[themeMode];
