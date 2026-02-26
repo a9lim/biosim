@@ -94,11 +94,23 @@ Each membrane protein has a unique silhouette in `enzymes.js` reflecting its rea
 
 ### Light/Dark Mode
 
-CSS `.light-mode` class on `<body>` toggles theme variables. Canvas drawing reads `lightMode` flag and calls `getPalette(key, lightMode)` to swap fill/stroke colors. Both UI and canvas adapt simultaneously.
+Three-state theme toggle in the toolbar: **Simulation** (follows sunlight toggle), **Light**, **Dark**. CSS `.light-mode` class on `<body>` toggles theme variables. Canvas drawing reads `simState.visualLightMode` (set by `updateTheme()` in sim.js) to decouple visual theme from simulation `lightOn` state. `getPalette(key, lightMode)` swaps fill/stroke colors. Both UI and canvas adapt simultaneously.
+
+### Intro Screen
+
+Full-viewport overlay (`#intro-screen`, z-index 1000) shown on load. Displays title, description, instruction cards, and "Begin Simulation" button. Dismissal adds `.hidden` class (0.85s fade-out) and `.app-ready` class to `<body>`, which triggers staggered entrance animations for header (0.08s delay), glucose bar (0.2s), and zoom controls (0.35s). After 850ms the intro screen is set to `display: none`.
+
+### Sidebar Push & Membrane Extension
+
+Opening/closing the sidebar smoothly shifts the canvas metabolic network layout via `Renderer.sidebarInset`. The renderer animates `_sidebarInsetCurrent` toward `sidebarInset` using the same cubic-bezier and duration as the CSS sidebar transition (`0.45s cubic-bezier(0.23, 1, 0.32, 1)`), recomputing `computeLayout()` each frame during animation. Layout uses effective width `LW = W - _sidebarInsetCurrent` for ETC complexes and cytoplasm columns. The membrane is drawn `W + 400` wide so it extends behind the translucent sidebar without an abrupt cutoff.
+
+### Floating Glucose Bar
+
+The glucose button lives in a Gerry-style floating pill bar (`#glucose-bar`) fixed to bottom-center of the viewport. It appears via `paletteEnter` animation after `.app-ready` is set.
 
 ### HTML ↔ JS Binding Contract
 
-`sim.js` and `renderer.js` bind to DOM elements exclusively via `getElementById` (~37 IDs). **Class names, hierarchy, and structure can change freely** — only element IDs must be preserved. The only CSS class references in JS are `light-mode` on `<body>` and `bump` on stat value elements.
+`sim.js` and `renderer.js` bind to DOM elements exclusively via `getElementById` (~40 IDs). **Class names, hierarchy, and structure can change freely** — only element IDs must be preserved. The only CSS class references in JS are `light-mode` on `<body>`, `app-ready` on `<body>`, `closed` on `#dashboard`, `active` on `.tool-btn`/`.tab-btn`, and `bump` on stat value elements.
 
 To verify after HTML restructuring:
 ```bash
@@ -108,10 +120,18 @@ All JS IDs must appear in the HTML output.
 
 ### Dashboard Tabbed Sidebar
 
-The sidebar uses a tabbed interface with three panels: **Controls** (pathway/environment toggles), **Stats** (bioenergetics counters), **Reference** (net equations, legend). Tab switching is handled by a small inline `<script>` before the sim scripts load. Active Step and Metabolite Gauges stay pinned above the tabs (always visible).
+The sidebar uses a Gerry-style floating panel with a header ("Metabolism" title + close button) and a tabbed interface with three panels: **Controls** (pathway/environment toggles), **Stats** (active step, metabolite gauges, bioenergetics counters), **Reference** (net equations, legend). Tab switching is handled by a small inline `<script>` before the sim scripts load. The hamburger menu button in the toolbar and the X close button in the sidebar header both call `toggleSidebar()`.
 
 ### CSS Design Tokens
 
-CSS custom properties use shortened names: `--pw-glyc`, `--pw-krebs`, `--pw-calvin`, `--pw-ppp`, `--pw-cyclic`, `--pw-ferment` for pathway colors; `--co-atp`, `--co-nadh`, `--co-nadph`, `--co-fadh2` for cofactor bar colors. Each has a companion `-rgb` variable for `rgba()` usage.
+CSS custom properties follow the Gerry project's warm earth-tone palette. Shortened names: `--pw-glyc`, `--pw-krebs`, `--pw-calvin`, `--pw-ppp`, `--pw-cyclic`, `--pw-ferment` for pathway colors; `--co-atp`, `--co-nadh`, `--co-nadph`, `--co-fadh2` for cofactor bar colors. Each has a companion `-rgb` variable for `rgba()` usage.
 
-Additional CSS tokens: `--pw-electron`, `--pw-proton`, `--pw-photon` for particle legend colors; `--accent` / `--accent-rgb` / `--accent-light` for the gold accent; `--tog-bg` / `--tog-thumb-on` for toggle switch base colors. Toggle gradient colors derive from pathway/cofactor variables via `color-mix(in srgb, var(--pw-*), black N%)` — no raw hex in toggle rules.
+Surfaces: `--bg-canvas` (#0C0B09 dark / #F0EDE4 light), `--bg-panel` (translucent with backdrop blur), `--bg-elevated`, `--bg-hover`. Accent: `--accent` (#E89B80 dark / #D97757 light) / `--accent-rgb` / `--accent-light` / `--accent-glow` / `--accent-subtle` for the rust-red accent. Shadows: three-tier `--shadow-sm`/`--shadow-md`/`--shadow-lg` with mode-dependent values.
+
+Typography: `--font-display` (Instrument Serif), `--font-body` (Geist), `--font-mono` (Geist Mono), `--font-label` (Sora). Canvas fonts remain JetBrains Mono / Sora via `_FONT` in enzymes.js.
+
+Additional CSS tokens: `--pw-electron`, `--pw-proton`, `--pw-photon` for particle legend colors; `--tog-bg` / `--tog-thumb-on` for toggle switch base colors. Toggle gradient colors derive from pathway/cofactor variables via `color-mix(in srgb, var(--pw-*), black N%)` — no raw hex in toggle rules.
+
+### UI Style — Gerry Design System
+
+All UI chrome (header, sidebar, zoom controls, glucose bar) follows the Gerry project's floating panel design: `position: fixed`, `backdrop-filter: blur(24px) saturate(1.3)`, `border-radius: 20px`, warm earth-tone palette, Geist/Geist Mono/Instrument Serif/Sora fonts, three-tier shadow system. Toolbar icons are Feather-style outline SVGs (`viewBox="0 0 24 24"`, `width="18" height="18"`, `stroke-width="2"`, `stroke-linecap="round"`, `stroke-linejoin="round"`).
