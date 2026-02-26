@@ -6,15 +6,10 @@
 /* ───── Reset ───── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* ───── Design Tokens (Dark default) ───── */
-/* Shared color vars (surfaces, text, accent, pathways, cofactors, particles)
+/* ───── Design Tokens (Light default) ───── */
+/* All color hex values (surfaces, shadows, toggles, pathways, cofactors)
    are injected by colors.js via <style id="palette-vars"> */
 :root {
-  --bg-scrim:         #00000026;
-  --bg-track:         #ffffff0a;
-  --track-shadow:     none;
-  --metab-card-bg:    transparent;
-
   /* Radius — Gerry */
   --radius-sm:  8px;
   --radius-md:  14px;
@@ -25,25 +20,23 @@
   --toolbar-h:  52px;
   --panel-w:    350px;
 
-  /* Shadows — Gerry dark */
-  --shadow-sm:  0 1px 4px #00000033, 0 0 0 1px #ffffff08;
-  --shadow-md:  0 4px 20px #0000004d, 0 0 0 1px #ffffff08;
-  --shadow-lg:  0 12px 48px #00000066, 0 0 0 1px #ffffff08;
-
   /* Easing — Gerry */
   --ease-out:    cubic-bezier(0.23, 1, 0.32, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
 
-  /* Toggle */
-  --tog-bg:           #181612;
-  --tog-thumb-on:     var(--text);
-  --tog-border:       #ffffff0f;
-  --tog-inset:        #00000059;
-  --tog-thumb-shadow: #00000073;
-  --tog-checked-inset: #00000033;
-  --tog-checked-extra: #0000004d;
-  --tog-shadow:       inset 0 1px 3px var(--tog-inset);
+  /* Toggle (non-color) */
+  --tog-shadow:       inset 0 1px 2px var(--tog-inset);
+}
+
+
+/* ───── Glass Panel ───── */
+.glass {
+  background: var(--bg-panel);
+  backdrop-filter: blur(24px) saturate(1.3);
+  -webkit-backdrop-filter: blur(24px) saturate(1.3);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
 }
 
 
@@ -228,7 +221,7 @@ html {
   font-size: clamp(14px, 1.5vw, 16px);
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 body {
@@ -260,12 +253,7 @@ header {
   align-items: center;
   justify-content: space-between;
   padding: 0 12px 0 20px;
-  background: var(--bg-panel);
-  backdrop-filter: blur(24px) saturate(1.3);
-  -webkit-backdrop-filter: blur(24px) saturate(1.3);
-  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
   gap: 1rem;
   opacity: 0;
   pointer-events: none;
@@ -289,7 +277,7 @@ header {
 
 .header-brand h1 em {
   font-style: italic;
-  background: linear-gradient(135deg, var(--accent-light) 20%, var(--accent) 80%);
+  background: linear-gradient(135deg, var(--accent) 20%, color-mix(in srgb, var(--accent), black 20%) 80%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -304,7 +292,7 @@ header {
 
 
 /* ═══════════════════════════════════════
-   TOOL BUTTONS — Gerry pattern
+   TOOL BUTTONS
    ═══════════════════════════════════════ */
 .tool-btn {
   width: 34px;
@@ -417,12 +405,7 @@ main {
   flex-direction: column;
   gap: 1px;
   z-index: 10;
-  background: var(--bg-panel);
-  backdrop-filter: blur(24px) saturate(1.3);
-  -webkit-backdrop-filter: blur(24px) saturate(1.3);
-  border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-md);
   padding: 3px;
   opacity: 0;
   pointer-events: none;
@@ -495,13 +478,8 @@ main {
   align-items: center;
   gap: 5px;
   padding: 5px 8px;
-  background: var(--bg-panel);
-  backdrop-filter: blur(24px) saturate(1.3);
-  -webkit-backdrop-filter: blur(24px) saturate(1.3);
-  border: 1px solid var(--border);
   border-radius: var(--radius-pill);
   z-index: 100;
-  box-shadow: var(--shadow-md);
   opacity: 0;
   pointer-events: none;
   transition: background-color 0.4s var(--ease-out), border-color 0.3s var(--ease-out);
@@ -550,7 +528,7 @@ main {
 
 
 /* ═══════════════════════════════════════
-   DASHBOARD SIDEBAR — Gerry-style floating
+   DASHBOARD SIDEBAR
    ═══════════════════════════════════════ */
 #dashboard {
   position: fixed;
@@ -562,10 +540,6 @@ main {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: var(--bg-panel);
-  backdrop-filter: blur(24px) saturate(1.3);
-  -webkit-backdrop-filter: blur(24px) saturate(1.3);
-  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
   transform: translateX(0);
@@ -584,7 +558,7 @@ main {
 
 
 /* ═══════════════════════════════════════
-   SIDEBAR HEADER — Gerry pattern
+   SIDEBAR HEADER
    ═══════════════════════════════════════ */
 .stats-header {
   display: flex;
@@ -741,48 +715,21 @@ main {
   transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-/* ATP */
-.mc-atp {
-  background: color-mix(in srgb, var(--co-atp) 5%, transparent);
-}
-.mc-atp:hover { box-shadow: 0 0 16px color-mix(in srgb, var(--co-atp) 6%, transparent); }
-.mc-atp .metab-pct { color: var(--co-atp); }
-#atp-bar {
-  background: linear-gradient(90deg, color-mix(in srgb, var(--co-atp), black 20%), var(--co-atp));
-  box-shadow: 0 0 6px color-mix(in srgb, var(--co-atp) 35%, transparent);
-}
+/* Per-card color assignments */
+.mc-atp   { --mc-color: var(--co-atp); }
+.mc-nadh  { --mc-color: var(--co-nadh); }
+.mc-nadph { --mc-color: var(--co-nadph); }
+.mc-fadh2 { --mc-color: var(--co-fadh2); }
 
-/* NADH */
-.mc-nadh {
-  background: color-mix(in srgb, var(--co-nadh) 5%, transparent);
+/* Generic metabolite card styles */
+.metab-card[class*="mc-"] {
+  background: color-mix(in srgb, var(--mc-color) 8%, transparent);
 }
-.mc-nadh:hover { box-shadow: 0 0 16px color-mix(in srgb, var(--co-nadh) 6%, transparent); }
-.mc-nadh .metab-pct { color: var(--co-nadh); }
-#nadh-bar {
-  background: linear-gradient(90deg, color-mix(in srgb, var(--co-nadh), black 20%), var(--co-nadh));
-  box-shadow: 0 0 6px color-mix(in srgb, var(--co-nadh) 35%, transparent);
-}
-
-/* NADPH */
-.mc-nadph {
-  background: color-mix(in srgb, var(--co-nadph) 5%, transparent);
-}
-.mc-nadph:hover { box-shadow: 0 0 16px color-mix(in srgb, var(--co-nadph) 6%, transparent); }
-.mc-nadph .metab-pct { color: var(--co-nadph); }
-#nadph-bar {
-  background: linear-gradient(90deg, color-mix(in srgb, var(--co-nadph), black 20%), var(--co-nadph));
-  box-shadow: 0 0 6px color-mix(in srgb, var(--co-nadph) 35%, transparent);
-}
-
-/* FADH₂ */
-.mc-fadh2 {
-  background: color-mix(in srgb, var(--co-fadh2) 5%, transparent);
-}
-.mc-fadh2:hover { box-shadow: 0 0 16px color-mix(in srgb, var(--co-fadh2) 6%, transparent); }
-.mc-fadh2 .metab-pct { color: var(--co-fadh2); }
-#fadh2-bar {
-  background: linear-gradient(90deg, color-mix(in srgb, var(--co-fadh2), black 20%), var(--co-fadh2));
-  box-shadow: 0 0 6px color-mix(in srgb, var(--co-fadh2) 35%, transparent);
+.metab-card[class*="mc-"]:hover { box-shadow: 0 0 16px color-mix(in srgb, var(--mc-color) 6%, transparent); }
+.metab-card[class*="mc-"] .metab-pct { color: var(--mc-color); }
+.metab-card[class*="mc-"] .metab-fill {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--mc-color), black 20%), var(--mc-color));
+  box-shadow: 0 0 6px color-mix(in srgb, var(--mc-color) 35%, transparent);
 }
 
 
@@ -949,97 +896,32 @@ main {
 .tog-icon-on { right: 5px; opacity: 0.25; }
 .tog-icon-off { left: 5px; opacity: 0.6; }
 
-/* Base checked state */
+/* Per-toggle color assignments */
+.tog        { --tog-color: var(--accent); --tog-shift: 20px; }
+.tog-light  { --tog-color: var(--co-atp); }
+.tog-o2     { --tog-color: var(--co-nadh); }
+.tog-glyc   { --tog-color: var(--pw-glyc); }
+.tog-ppp    { --tog-color: var(--pw-ppp); }
+.tog-calvin { --tog-color: var(--pw-calvin); }
+.tog-krebs  { --tog-color: var(--pw-krebs); }
+
+/* Generic checked state */
 .tog-wrap input:checked + .tog {
-  background: linear-gradient(135deg, color-mix(in srgb, var(--accent), black 82%), color-mix(in srgb, var(--accent), black 72%));
-  border-color: color-mix(in srgb, var(--accent) 14%, transparent);
+  background: linear-gradient(135deg, var(--tog-color), color-mix(in srgb, var(--tog-color), black 25%));
+  border-color: color-mix(in srgb, var(--tog-color) 35%, transparent);
   box-shadow: inset 0 1px 3px var(--tog-checked-inset);
 }
-
 .tog-wrap input:checked + .tog .tog-thumb {
-  transform: translateX(20px);
-  background: var(--accent);
-  box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 50%, transparent), 0 1px 2px var(--tog-checked-extra);
+  transform: translateX(var(--tog-shift));
+  background: var(--tog-thumb-on);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--tog-color) 50%, transparent);
 }
-
 .tog-wrap input:checked + .tog .tog-icon-on { opacity: 1; }
 .tog-wrap input:checked + .tog .tog-icon-off { opacity: 0.25; }
 
-/* Sunlight toggle */
-#light-toggle:checked + .tog-light {
-  background: linear-gradient(135deg, color-mix(in srgb, var(--co-atp), black 82%), color-mix(in srgb, var(--co-atp), black 72%));
-  border-color: color-mix(in srgb, var(--co-atp) 35%, transparent);
-  box-shadow: 0 0 14px color-mix(in srgb, var(--co-atp) 12%, transparent), inset 0 1px 2px var(--tog-checked-inset);
-}
-
-#light-toggle:checked + .tog-light .tog-thumb {
-  transform: translateX(20px);
-  background: var(--co-atp);
-  box-shadow: 0 0 14px color-mix(in srgb, var(--co-atp) 65%, transparent), 0 0 4px var(--co-atp);
-}
-
-/* O₂ toggle */
-#oxygen-toggle:checked + .tog-o2 {
-  background: linear-gradient(135deg, color-mix(in srgb, var(--co-nadh), black 82%), color-mix(in srgb, var(--co-nadh), black 72%));
-  border-color: color-mix(in srgb, var(--co-nadh) 22%, transparent);
-}
-
-#oxygen-toggle:checked + .tog-o2 .tog-thumb {
-  transform: translateX(20px);
-  background: var(--co-nadh);
-  box-shadow: 0 0 8px color-mix(in srgb, var(--co-nadh) 50%, transparent);
-}
-
-/* Pathway-colored toggles */
-#glyc-toggle:checked + .tog-glyc {
-  background: linear-gradient(135deg, color-mix(in srgb, var(--pw-glyc), black 82%), color-mix(in srgb, var(--pw-glyc), black 72%));
-  border-color: color-mix(in srgb, var(--pw-glyc) 22%, transparent);
-}
-#glyc-toggle:checked + .tog-glyc .tog-thumb {
-  transform: translateX(20px);
-  background: var(--pw-glyc);
-  box-shadow: 0 0 8px color-mix(in srgb, var(--pw-glyc) 50%, transparent);
-}
-
-#ppp-toggle:checked + .tog-ppp {
-  background: linear-gradient(135deg, color-mix(in srgb, var(--pw-ppp), black 82%), color-mix(in srgb, var(--pw-ppp), black 72%));
-  border-color: color-mix(in srgb, var(--pw-ppp) 22%, transparent);
-}
-#ppp-toggle:checked + .tog-ppp .tog-thumb {
-  transform: translateX(20px);
-  background: var(--pw-ppp);
-  box-shadow: 0 0 8px color-mix(in srgb, var(--pw-ppp) 50%, transparent);
-}
-
-#calvin-toggle:checked + .tog-calvin {
-  background: linear-gradient(135deg, color-mix(in srgb, var(--pw-calvin), black 82%), color-mix(in srgb, var(--pw-calvin), black 72%));
-  border-color: color-mix(in srgb, var(--pw-calvin) 22%, transparent);
-}
-#calvin-toggle:checked + .tog-calvin .tog-thumb {
-  transform: translateX(20px);
-  background: var(--pw-calvin);
-  box-shadow: 0 0 8px color-mix(in srgb, var(--pw-calvin) 50%, transparent);
-}
-
-#krebs-toggle:checked + .tog-krebs {
-  background: linear-gradient(135deg, color-mix(in srgb, var(--pw-krebs), black 82%), color-mix(in srgb, var(--pw-krebs), black 72%));
-  border-color: color-mix(in srgb, var(--pw-krebs) 22%, transparent);
-}
-#krebs-toggle:checked + .tog-krebs .tog-thumb {
-  transform: translateX(20px);
-  background: var(--pw-krebs);
-  box-shadow: 0 0 8px color-mix(in srgb, var(--pw-krebs) 50%, transparent);
-}
-
-/* Auto-play toggle — accent */
-#autoplay-toggle:checked + .tog-auto {
-  background: linear-gradient(135deg, color-mix(in srgb, var(--accent), black 82%), color-mix(in srgb, var(--accent), black 72%));
-  border-color: color-mix(in srgb, var(--accent) 22%, transparent);
-}
-#autoplay-toggle:checked + .tog-auto .tog-thumb {
-  transform: translateX(20px);
-  background: var(--accent);
-  box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 55%, transparent);
+/* Sunlight glow exception */
+.tog-wrap input:checked + .tog-light {
+  box-shadow: 0 0 12px color-mix(in srgb, var(--tog-color) 30%, transparent);
 }
 
 
@@ -1130,14 +1012,16 @@ main {
 }
 
 /* Equation pathway colors */
-.eq-glycolysis .eq-name, .eq-glycolysis .eq-dot { color: var(--pw-glyc); }
-.eq-calvin .eq-name, .eq-calvin .eq-dot { color: var(--pw-calvin); }
-.eq-krebs .eq-name, .eq-krebs .eq-dot { color: var(--pw-krebs); }
-.eq-ppp .eq-name, .eq-ppp .eq-dot { color: var(--pw-ppp); }
-.eq-oxphos .eq-name, .eq-oxphos .eq-dot { color: var(--pw-krebs); }
-.eq-light .eq-name, .eq-light .eq-dot { color: var(--pw-calvin); }
-.eq-cyclic .eq-name, .eq-cyclic .eq-dot { color: var(--pw-cyclic); }
-.eq-ferment .eq-name, .eq-ferment .eq-dot { color: var(--pw-ferment); }
+.eq-glycolysis { --eq-color: var(--pw-glyc); }
+.eq-calvin     { --eq-color: var(--pw-calvin); }
+.eq-krebs      { --eq-color: var(--pw-krebs); }
+.eq-ppp        { --eq-color: var(--pw-ppp); }
+.eq-oxphos     { --eq-color: var(--pw-krebs); }
+.eq-light      { --eq-color: var(--pw-calvin); }
+.eq-cyclic     { --eq-color: var(--pw-cyclic); }
+.eq-ferment    { --eq-color: var(--pw-ferment); }
+.equation[class*="eq-"] .eq-name,
+.equation[class*="eq-"] .eq-dot { color: var(--eq-color); }
 
 
 /* ═══════════════════════════════════════
@@ -1177,131 +1061,56 @@ main {
   flex-shrink: 0;
 }
 
-.legend-dot.respiratory { background: var(--pw-krebs); }
-.legend-dot.photosynthetic { background: var(--pw-calvin); }
-.legend-dot.shared { background: var(--pw-glyc); }
-.legend-dot.ppp-dot { background: var(--pw-ppp); }
-.legend-dot.cyclic-dot { background: var(--pw-cyclic); }
-.legend-dot.ferment-dot { background: var(--pw-ferment); }
+.legend-dot.respiratory    { --dot-color: var(--pw-krebs); }
+.legend-dot.photosynthetic { --dot-color: var(--pw-calvin); }
+.legend-dot.shared         { --dot-color: var(--pw-glyc); }
+.legend-dot.ppp-dot        { --dot-color: var(--pw-ppp); }
+.legend-dot.cyclic-dot     { --dot-color: var(--pw-cyclic); }
+.legend-dot.ferment-dot    { --dot-color: var(--pw-ferment); }
+.legend-dot.electron       { --dot-color: var(--pw-electron); }
+.legend-dot.proton         { --dot-color: var(--pw-proton); }
+.legend-dot.photon         { --dot-color: var(--pw-photon); }
 
-.legend-dot.electron {
-  background: var(--pw-electron);
-  box-shadow: 0 0 5px color-mix(in srgb, var(--pw-electron) 50%, transparent);
-}
-
-.legend-dot.proton {
-  background: var(--pw-proton);
-  box-shadow: 0 0 5px color-mix(in srgb, var(--pw-proton) 40%, transparent);
-}
-
-.legend-dot.photon {
-  background: var(--pw-photon);
-  box-shadow: 0 0 5px color-mix(in srgb, var(--pw-photon) 50%, transparent);
-}
+.legend-dot[class] { background: var(--dot-color); }
+.legend-dot.electron,
+.legend-dot.proton,
+.legend-dot.photon { box-shadow: 0 0 5px color-mix(in srgb, var(--dot-color) 50%, transparent); }
 
 
 /* ═══════════════════════════════════════
-   LIGHT MODE — Gerry light palette
+   DARK MODE
    ═══════════════════════════════════════ */
-body.light-mode {
-  /* Shared color overrides injected by colors.js */
-
-  --shadow-sm:  0 1px 4px #0000000a, 0 0 0 1px #00000005;
-  --shadow-md:  0 4px 20px #0000000f, 0 0 0 1px #00000005;
-  --shadow-lg:  0 12px 48px #0000001a, 0 0 0 1px #00000005;
-
-  --tog-bg:           #c8ccd4;
-  --tog-thumb-on:     #fff;
-  --bg-scrim:         #ffffff33;
-  --bg-track:         #00000014;
-  --track-shadow:     inset 0 1px 1px #0000000f;
-  --metab-card-bg:    #00000005;
-  --tog-border:       #0000000f;
-  --tog-inset:        #00000014;
-  --tog-shadow:       inset 0 1px 2px var(--tog-inset);
-
-  color-scheme: light;
+[data-theme="dark"] {
+  /* Color overrides injected by colors.js */
+  --tog-shadow:       inset 0 1px 3px var(--tog-inset);
+  color-scheme: dark;
 }
 
-body.light-mode .header-brand h1 em {
-  background: linear-gradient(135deg, var(--accent) 20%, color-mix(in srgb, var(--accent), black 20%) 80%);
+[data-theme="dark"] .header-brand h1 em {
+  background: linear-gradient(135deg, var(--accent-light) 20%, var(--accent) 80%);
   -webkit-background-clip: text;
   background-clip: text;
 }
 
-/* Light-mode toggle overrides */
-body.light-mode #light-toggle:checked + .tog-light {
-  background: linear-gradient(135deg, var(--co-atp), color-mix(in srgb, var(--co-atp), black 25%));
-  border-color: color-mix(in srgb, var(--co-atp) 35%, transparent);
-  box-shadow: 0 0 12px color-mix(in srgb, var(--co-atp) 30%, transparent);
+/* Dark-mode toggle overrides (generic) */
+[data-theme="dark"] .tog-wrap input:checked + .tog {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--tog-color), black 82%), color-mix(in srgb, var(--tog-color), black 72%));
+  border-color: color-mix(in srgb, var(--tog-color) 22%, transparent);
 }
-body.light-mode #light-toggle:checked + .tog-light .tog-thumb {
-  background: var(--tog-thumb-on);
-  box-shadow: 0 0 8px color-mix(in srgb, var(--co-atp) 60%, transparent);
+[data-theme="dark"] .tog-wrap input:checked + .tog .tog-thumb {
+  background: var(--tog-color);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--tog-color) 50%, transparent);
 }
-
-body.light-mode #oxygen-toggle:checked + .tog-o2 {
-  background: linear-gradient(135deg, var(--co-nadh), color-mix(in srgb, var(--co-nadh), black 25%));
-  border-color: color-mix(in srgb, var(--co-nadh) 35%, transparent);
+/* Sunlight dark glow */
+[data-theme="dark"] .tog-wrap input:checked + .tog-light {
+  border-color: color-mix(in srgb, var(--tog-color) 35%, transparent);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--tog-color) 12%, transparent), inset 0 1px 2px var(--tog-checked-inset);
 }
-body.light-mode #oxygen-toggle:checked + .tog-o2 .tog-thumb {
-  background: var(--tog-thumb-on);
-  box-shadow: 0 0 6px color-mix(in srgb, var(--co-nadh) 50%, transparent);
+[data-theme="dark"] .tog-wrap input:checked + .tog-light .tog-thumb {
+  box-shadow: 0 0 14px color-mix(in srgb, var(--tog-color) 65%, transparent), 0 0 4px var(--tog-color);
 }
 
-body.light-mode #glyc-toggle:checked + .tog-glyc {
-  background: linear-gradient(135deg, var(--pw-glyc), color-mix(in srgb, var(--pw-glyc), black 25%));
-  border-color: color-mix(in srgb, var(--pw-glyc) 35%, transparent);
-}
-body.light-mode #glyc-toggle:checked + .tog-glyc .tog-thumb {
-  background: var(--tog-thumb-on);
-  box-shadow: 0 0 6px color-mix(in srgb, var(--pw-glyc) 50%, transparent);
-}
-
-body.light-mode #ppp-toggle:checked + .tog-ppp {
-  background: linear-gradient(135deg, var(--pw-ppp), color-mix(in srgb, var(--pw-ppp), black 25%));
-  border-color: color-mix(in srgb, var(--pw-ppp) 35%, transparent);
-}
-body.light-mode #ppp-toggle:checked + .tog-ppp .tog-thumb {
-  background: var(--tog-thumb-on);
-  box-shadow: 0 0 6px color-mix(in srgb, var(--pw-ppp) 50%, transparent);
-}
-
-body.light-mode #calvin-toggle:checked + .tog-calvin {
-  background: linear-gradient(135deg, var(--pw-calvin), color-mix(in srgb, var(--pw-calvin), black 25%));
-  border-color: color-mix(in srgb, var(--pw-calvin) 35%, transparent);
-}
-body.light-mode #calvin-toggle:checked + .tog-calvin .tog-thumb {
-  background: var(--tog-thumb-on);
-  box-shadow: 0 0 6px color-mix(in srgb, var(--pw-calvin) 50%, transparent);
-}
-
-body.light-mode #krebs-toggle:checked + .tog-krebs {
-  background: linear-gradient(135deg, var(--pw-krebs), color-mix(in srgb, var(--pw-krebs), black 25%));
-  border-color: color-mix(in srgb, var(--pw-krebs) 35%, transparent);
-}
-body.light-mode #krebs-toggle:checked + .tog-krebs .tog-thumb {
-  background: var(--tog-thumb-on);
-  box-shadow: 0 0 6px color-mix(in srgb, var(--pw-krebs) 50%, transparent);
-}
-
-body.light-mode #autoplay-toggle:checked + .tog-auto {
-  background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent), black 25%));
-  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
-}
-body.light-mode #autoplay-toggle:checked + .tog-auto .tog-thumb {
-  background: var(--tog-thumb-on);
-  box-shadow: 0 0 6px color-mix(in srgb, var(--accent) 50%, transparent);
-}
-
-body.light-mode .mc-atp { background: color-mix(in srgb, var(--co-atp) 8%, transparent); }
-body.light-mode .mc-nadh { background: color-mix(in srgb, var(--co-nadh) 8%, transparent); }
-body.light-mode .mc-nadph { background: color-mix(in srgb, var(--co-nadph) 8%, transparent); }
-body.light-mode .mc-fadh2 { background: color-mix(in srgb, var(--co-fadh2) 8%, transparent); }
-
-body.light-mode .pulse-dot {
-  background: var(--accent);
-}
+[data-theme="dark"] .metab-card[class*="mc-"] { background: color-mix(in srgb, var(--mc-color) 5%, transparent); }
 
 
 /* ═══════════════════════════════════════
@@ -1441,30 +1250,8 @@ input:focus-visible {
 
 /* Larger touch targets on coarse pointers */
 @media (pointer: coarse) {
-  .tog {
-    width: 48px;
-    height: 26px;
-    border-radius: 13px;
-  }
-
-  .tog-thumb {
-    width: 18px;
-    height: 18px;
-    left: 3px;
-    top: 3px;
-  }
-
-  .tog-wrap input:checked + .tog .tog-thumb,
-  #light-toggle:checked + .tog-light .tog-thumb,
-  #oxygen-toggle:checked + .tog-o2 .tog-thumb,
-  #glyc-toggle:checked + .tog-glyc .tog-thumb,
-  #ppp-toggle:checked + .tog-ppp .tog-thumb,
-  #calvin-toggle:checked + .tog-calvin .tog-thumb,
-  #krebs-toggle:checked + .tog-krebs .tog-thumb,
-  #autoplay-toggle:checked + .tog-auto .tog-thumb {
-    transform: translateX(22px);
-  }
-
+  .tog { --tog-shift: 22px; width: 48px; height: 26px; border-radius: 13px; }
+  .tog-thumb { width: 18px; height: 18px; }
 
   .ctrl-row {
     padding: 0.4rem 0;

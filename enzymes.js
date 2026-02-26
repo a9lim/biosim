@@ -4,6 +4,30 @@
 
 // _FONT defined in colors.js (canvas font families)
 
+// ---------- Pre-computed Font Strings (avoid per-frame template-literal allocation) ----------
+const _F = Object.freeze({
+  mono500_9:    `500 9px ${_FONT.mono}`,
+  mono500_10:   `500 10px ${_FONT.mono}`,
+  mono600_8:    `600 8px ${_FONT.mono}`,
+  mono600_9:    `600 9px ${_FONT.mono}`,
+  mono600_10:   `600 10px ${_FONT.mono}`,
+  mono700_8:    `700 8px ${_FONT.mono}`,
+  mono700_12:   `700 12px ${_FONT.mono}`,
+  mono700_13:   `700 13px ${_FONT.mono}`,
+  body300_9:    `300 9px ${_FONT.body}`,
+  body400_8:    `400 8px ${_FONT.body}`,
+  body500_14:   `500 14px ${_FONT.body}`,
+  emoji38:      `38px ${_FONT.emoji}`,
+  tag500:       `500 8.5px ${_FONT.mono}`,
+  tag700:       `700 8.5px ${_FONT.mono}`,
+});
+
+// drawLabel font cache: size → pre-built string (fallback for uncommon sizes)
+const _labelFonts = {};
+function _labelFont(size) {
+  return _labelFonts[size] || (_labelFonts[size] = `700 ${size}px ${_FONT.mono}`);
+}
+
 // ---------- Drawing Constants ----------
 const CFG = {
   arrowHeadLen: 8,
@@ -195,7 +219,7 @@ const EnzymeStyles = {
   },
 
   drawLabel(ctx, text, cx, cy, color, fontSize) {
-    ctx.font = `700 ${fontSize || 13}px ${_FONT.mono}`;
+    ctx.font = fontSize ? _labelFont(fontSize) : _F.mono700_13;
     ctx.fillStyle = color || _THEME.dark.textPrimary;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -457,7 +481,7 @@ const EnzymeStyles = {
     }
     ctx.lineWidth = 1.0;
     this.applyStyle(ctx, palette, active ? 6 : 0);
-    ctx.font = `600 9px ${_FONT.mono}`;
+    ctx.font = _F.mono600_9;
     ctx.fillStyle = active ? th.textPrimary : th.textSecondary;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -470,12 +494,12 @@ const EnzymeStyles = {
       ctx.arc(bx, by, badgeR, 0, _TWO_PI);
       ctx.fillStyle = th.accentBadge;
       ctx.fill();
-      ctx.font = `700 8px ${_FONT.mono}`;
+      ctx.font = _F.mono700_8;
       ctx.fillStyle = th.textOnAccent;
       ctx.fillText(count, bx, by);
     }
     if (show2x) {
-      ctx.font = `600 8px ${_FONT.mono}`;
+      ctx.font = _F.mono600_8;
       ctx.fillStyle = th.textMuted;
       ctx.fillText('2x', cx, cy + 18);
     }
@@ -486,7 +510,7 @@ const EnzymeStyles = {
    *  the pill border and text use a left→right gradient of both pathway colors. */
   drawEnzymeTag(ctx, cx, cy, label, color, active, lightMode, color2) {
     const pad = CFG.enzymeTagPad;
-    ctx.font = `${active ? 700 : 500} ${CFG.enzymeTagFont}px ${_FONT.mono}`;
+    ctx.font = active ? _F.tag700 : _F.tag500;
     const tw = ctx.measureText(label).width;
     const w = tw + pad * 2;
     const h = 15;
@@ -589,7 +613,7 @@ const EnzymeStyles = {
     ctx.shadowBlur = 5 * intensity;
     ctx.fill();
     ctx.shadowBlur = 0;
-    ctx.font = `600 8px ${_FONT.mono}`;
+    ctx.font = _F.mono600_8;
     ctx.fillStyle = _r(_THEME.protonText, a);
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -730,7 +754,7 @@ const EnzymeStyles = {
     ctx.restore();
 
     // Label in the middle (drawn outside rotation so text stays upright)
-    ctx.font = `700 12px ${_FONT.mono}`;
+    ctx.font = _F.mono700_12;
     ctx.fillStyle = color;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';

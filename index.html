@@ -12,7 +12,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="styles.css">
   <script src="colors.js"></script>
 </head>
 
@@ -70,7 +70,7 @@
   </div>
 
   <!-- ═══ Header ═══ -->
-  <header>
+  <header class="glass">
     <div class="header-brand">
       <h1>Metabolism <em>Simulator</em></h1>
     </div>
@@ -110,7 +110,7 @@
     <!-- Canvas Simulation -->
     <div id="sim-container">
       <canvas id="sim-canvas"></canvas>
-      <div id="canvas-controls">
+      <div id="canvas-controls" class="glass">
         <button id="zoom-in-btn" title="Zoom in" aria-label="Zoom in">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         </button>
@@ -126,7 +126,7 @@
     </div>
 
     <!-- Dashboard Sidebar -->
-    <aside id="dashboard">
+    <aside id="dashboard" class="glass">
       <div class="stats-header">
         <h2 class="stats-title">Metabolism</h2>
         <button id="close-stats" class="tool-btn" title="Close" aria-label="Close panel">
@@ -314,7 +314,7 @@
     </aside>
 
     <!-- ─── Floating Glucose Bar (bottom) ─── -->
-    <div id="glucose-bar">
+    <div id="glucose-bar" class="glass">
       <button id="add-glucose-btn" class="glucose-pill" title="Add glucose to the system">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
           <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line>

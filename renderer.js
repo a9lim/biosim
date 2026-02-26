@@ -164,6 +164,7 @@ const Renderer = {
         let touchStartDist = 0;
         let touchStartX = 0, touchStartY = 0;
         let isTap = false;
+        const _mid = { x: 0, y: 0 };
 
         c.addEventListener('touchstart', (e) => {
             if (e.touches.length === 2) {
@@ -186,12 +187,10 @@ const Renderer = {
                 const dx = e.touches[0].clientX - e.touches[1].clientX;
                 const dy = e.touches[0].clientY - e.touches[1].clientY;
                 const dist = Math.sqrt(dx * dx + dy * dy);
-                const mid = {
-                    x: (e.touches[0].clientX + e.touches[1].clientX) / 2,
-                    y: (e.touches[0].clientY + e.touches[1].clientY) / 2
-                };
+                _mid.x = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+                _mid.y = (e.touches[0].clientY + e.touches[1].clientY) / 2;
                 const rect = c.getBoundingClientRect();
-                this._applyZoom(this.zoom * (dist / touchStartDist), mid.x - rect.left, mid.y - rect.top);
+                this._applyZoom(this.zoom * (dist / touchStartDist), _mid.x - rect.left, _mid.y - rect.top);
                 touchStartDist = dist;
             } else if (e.touches.length === 1) {
                 const dx = e.touches[0].clientX - touchStartX;
@@ -377,7 +376,7 @@ const Renderer = {
     },
 
     drawLabels(ctx, state, lm) {
-        ctx.font = `300 9px ${_FONT.body}`;
+        ctx.font = _F.body300_9;
         const th = EnzymeStyles.t(lm);
         ctx.fillStyle = th.sectionLabel;
         ctx.textAlign = 'center';
@@ -386,16 +385,16 @@ const Renderer = {
         const lightY = this.membraneY * 0.5;
         if (state.lightOn) {
             ctx.save();
-            ctx.font = `500 14px ${_FONT.body}`; ctx.fillStyle = EnzymeStyles.roleColors.lightIndicator.stroke;
+            ctx.font = _F.body500_14; ctx.fillStyle = EnzymeStyles.roleColors.lightIndicator.stroke;
             ctx.fillText('LIGHT', cx, lightY - 24);
-            ctx.font = `38px ${_FONT.emoji}`;
+            ctx.font = _F.emoji38;
             ctx.shadowColor = _r(EnzymeStyles.roleColors.lightIndicator.stroke, 0.4); ctx.shadowBlur = 16;
             ctx.fillText('☀', cx, lightY + 14); ctx.shadowBlur = 0;
             ctx.restore();
         } else {
-            ctx.font = `500 14px ${_FONT.body}`; ctx.fillStyle = _r(EnzymeStyles.roleColors.nightIndicator.stroke, 0.3);
+            ctx.font = _F.body500_14; ctx.fillStyle = _r(EnzymeStyles.roleColors.nightIndicator.stroke, 0.3);
             ctx.fillText('DARK', cx, lightY - 24);
-            ctx.font = `38px ${_FONT.emoji}`; ctx.fillStyle = _r(EnzymeStyles.roleColors.nightIndicator.stroke, 0.2);
+            ctx.font = _F.emoji38; ctx.fillStyle = _r(EnzymeStyles.roleColors.nightIndicator.stroke, 0.2);
             ctx.fillText('☾', cx, lightY + 14);
         }
     },
@@ -513,7 +512,7 @@ const Renderer = {
         EnzymeStyles.drawNNT(ctx, c.nnt.cx, c.nnt.cy, cxW - 4, cxH * 0.6, nntGlow, lm);
 
         // Yield labels: moved inside synced alpha blocks to dim instead of disappearing
-        ctx.font = `500 10px ${_FONT.mono}`; ctx.textAlign = 'center';
+        ctx.font = _F.mono500_10; ctx.textAlign = 'center';
 
         ctx.save();
         ctx.globalAlpha = phA;
@@ -533,7 +532,7 @@ const Renderer = {
         // ATP Synthase: downward 4H⁺ arrow (protons flowing through to make ATP) + +ATP label below
         const atpBotY = c.atpSyn.cy + cxH * 0.8 / 2;
         this.drawSmallProtonArrow(ctx, c.atpSyn.cx, atpBotY + 3, '4H⁺', 'down');
-        ctx.font = `500 10px ${_FONT.mono}`;
+        ctx.font = _F.mono500_10;
         ctx.fillStyle = atpSynC; ctx.textAlign = 'center';
         ctx.fillText('+ATP', c.atpSyn.cx, atpBotY + 47);
 
@@ -541,7 +540,7 @@ const Renderer = {
         {
             const nntBotY = c.nnt.cy + cxH * 0.6 / 2;
             this.drawSmallProtonArrow(ctx, c.nnt.cx, nntBotY + 3, '1H⁺', 'down');
-            ctx.font = `500 10px ${_FONT.mono}`;
+            ctx.font = _F.mono500_10;
             ctx.fillStyle = nntC; ctx.textAlign = 'center';
             ctx.fillText('+NADPH', c.nnt.cx, nntBotY + 47);
             ctx.fillText('-NADH', c.nnt.cx, nntBotY + 59);
@@ -573,7 +572,7 @@ const Renderer = {
         ctx.lineTo(x2 - headLen, y - headLen * 0.5);
         ctx.lineTo(x2 - headLen, y + headLen * 0.5);
         ctx.fillStyle = color; ctx.fill();
-        ctx.font = `700 12px ${_FONT.mono}`;
+        ctx.font = _F.mono700_12;
         ctx.fillStyle = color; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
         ctx.fillText(label, midX, y);
         this.enzymeHitboxes.push({ cx: midX, cy: y, w: halfW * 2, h: 30, pathway, stepIndex: 0 });
@@ -582,7 +581,7 @@ const Renderer = {
     drawSmallProtonArrow(ctx, x, y, label, dir = 'up') {
         const protonC = EnzymeStyles.roleColors.proton.stroke;
         ctx.strokeStyle = protonC; ctx.lineWidth = 2;
-        ctx.font = `600 10px ${_FONT.mono}`; ctx.fillStyle = protonC; ctx.textAlign = 'center';
+        ctx.font = _F.mono600_10; ctx.fillStyle = protonC; ctx.textAlign = 'center';
         if (dir === 'down') {
             ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y + 14); ctx.stroke();
             ctx.beginPath(); ctx.moveTo(x, y + 17); ctx.lineTo(x - 5, y + 11); ctx.lineTo(x + 5, y + 11); ctx.closePath(); ctx.fill();
@@ -607,7 +606,7 @@ const Renderer = {
         const fC = this.pathwayColors.fermentation;
 
 
-        ctx.font = `400 8px ${_FONT.body}`;
+        ctx.font = _F.body400_8;
         ctx.fillStyle = EnzymeStyles.t(lm).sectionLabelAlt;
         ctx.textAlign = 'left';
         ctx.fillText('CYTOPLASMIC CARBON METABOLISM', 5, this.membraneY + this.membraneH + 16);
@@ -801,7 +800,7 @@ const Renderer = {
         // ══════════════════════════════════════════════════
         // METABOLITE NODES (drawn last, on top)
         // ══════════════════════════════════════════════════
-        ctx.font = `600 9px ${_FONT.mono}`;
+        ctx.font = _F.mono600_9;
         for (const key of this._metabKeys) {
             const mA = this.getMetabAlpha(key, gA, cA, pA, kA, state);
             if (mA > 0.01) {
@@ -897,7 +896,7 @@ const Renderer = {
 
     drawYieldBadge(ctx, node, active, text, color) {
         if (!active) return;
-        ctx.font = `500 9px ${_FONT.mono}`; ctx.fillStyle = color;
+        ctx.font = _F.mono500_9; ctx.fillStyle = color;
         ctx.textAlign = 'center'; ctx.fillText(text, node.cx, node.cy + 19);
     },
 
@@ -912,7 +911,7 @@ const Renderer = {
         ctx.save();
         ctx.globalAlpha = krebsAlpha;
 
-        ctx.font = `400 8px ${_FONT.body}`;
+        ctx.font = _F.body400_8;
         ctx.fillStyle = EnzymeStyles.t(lm).protonPoolLabel; ctx.textAlign = 'center';
 
         // Citrate Synthase: AcCoA → Citrate + OAA → Citrate (both straight)
@@ -949,7 +948,7 @@ const Renderer = {
     },
 
     drawFloatLabel(ctx, x, y, text, color) {
-        ctx.font = `500 10px ${_FONT.mono}`;
+        ctx.font = _F.mono500_10;
         ctx.fillStyle = color;
         ctx.textAlign = 'center';
         ctx.fillText(text, x, y - 10);
@@ -957,7 +956,7 @@ const Renderer = {
 
     /** Two-part float label with separate colors, centered as a unit */
     drawDualFloatLabel(ctx, x, y, text1, color1, text2, color2) {
-        ctx.font = `500 10px ${_FONT.mono}`;
+        ctx.font = _F.mono500_10;
         const w1 = ctx.measureText(text1).width;
         const gap = ctx.measureText(' ').width;
         const w2 = ctx.measureText(text2).width;
