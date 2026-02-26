@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════
-   Metabolism Simulator
+   Cellular Metabolism
    Typography: Instrument Serif (display) · Geist (body) · Geist Mono (data)
    ═══════════════════════════════════════════════════════════════ */
 
@@ -240,7 +240,7 @@ body {
 
 
 /* ═══════════════════════════════════════
-   HEADER — Gerry-style floating toolbar
+   HEADER
    ═══════════════════════════════════════ */
 header {
   position: fixed;
@@ -467,7 +467,7 @@ main {
 
 
 /* ═══════════════════════════════════════
-   FLOATING GLUCOSE BAR — Gerry palette pattern
+   FLOATING GLUCOSE BAR
    ═══════════════════════════════════════ */
 #glucose-bar {
   position: fixed;
