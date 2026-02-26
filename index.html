@@ -10,25 +10,97 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+  <!-- ═══ Intro Screen ═══ -->
+  <div id="intro-screen">
+    <div class="intro-bg"></div>
+    <div class="intro-content">
+      <span class="intro-overline">Interactive Simulation</span>
+      <h1 class="intro-title">Cellular<br>Metabolism</h1>
+      <p class="intro-desc">Explore how enzymes drive biochemical reactions in real time.<br>
+        Click pathways, toggle environments, and watch metabolites flow.</p>
+
+      <div class="intro-cards">
+        <div class="intro-card">
+          <div class="intro-card-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M15 15l-2 5L9 9l11 4-5 2z"></path><path d="M22 22l-5-5"></path>
+            </svg>
+          </div>
+          <div class="intro-card-text">
+            <strong>Click</strong>
+            <span>Advance reactions step by step</span>
+          </div>
+        </div>
+        <div class="intro-card">
+          <div class="intro-card-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line>
+            </svg>
+          </div>
+          <div class="intro-card-text">
+            <strong>Toggle</strong>
+            <span>Control sunlight, O&#x2082;, and pathways</span>
+          </div>
+        </div>
+        <div class="intro-card">
+          <div class="intro-card-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+            </svg>
+          </div>
+          <div class="intro-card-text">
+            <strong>Track</strong>
+            <span>Monitor ATP, NADH, and redox state</span>
+          </div>
+        </div>
+      </div>
+
+      <button id="intro-start">Begin Simulation</button>
+    </div>
+  </div>
+
   <!-- ═══ Header ═══ -->
   <header>
     <div class="header-brand">
       <h1>Metabolism <em>Simulator</em></h1>
     </div>
-    <div class="header-actions">
-      <button id="add-glucose-btn" class="btn btn-glucose">
-        <svg class="btn-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="8" y1="3" x2="8" y2="13" /><line x1="3" y1="8" x2="13" y2="8" />
+    <div class="header-tools">
+      <!-- glucose button moved to floating bottom bar -->
+      <button id="reset-btn" class="tool-btn" aria-label="Reset simulation" title="Reset simulation">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path>
         </svg>
-        Glucose
       </button>
-      <button id="reset-btn" class="btn btn-reset">Reset</button>
+      <span class="tool-sep"></span>
+      <button id="theme-btn" class="tool-btn" data-theme="auto" aria-label="Toggle theme" title="Theme: Simulation">
+        <svg class="icon-auto" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"></circle><path d="M12 7v10"></path><path d="M12 7a5 5 0 0 0 0 10" fill="currentColor" opacity="0.25" stroke="none"></path>
+        </svg>
+        <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+      <button id="menu-btn" class="tool-btn active" aria-label="Toggle sidebar" title="Toggle sidebar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
     </div>
   </header>
 
@@ -38,71 +110,30 @@
     <div id="sim-container">
       <canvas id="sim-canvas"></canvas>
       <div id="canvas-controls">
-        <button id="zoom-in-btn" aria-label="Zoom in" title="Zoom in">+</button>
-        <button id="zoom-out-btn" aria-label="Zoom out" title="Zoom out">&minus;</button>
-        <button id="zoom-reset-btn" aria-label="Reset zoom" title="Reset zoom">&#x21BA;</button>
+        <button id="zoom-in-btn" title="Zoom in" aria-label="Zoom in">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <span id="zoom-indicator">100%</span>
+        <button id="zoom-out-btn" title="Zoom out" aria-label="Zoom out">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <div class="ctrl-sep-hz"></div>
+        <button id="zoom-reset-btn" title="Fit to view" aria-label="Reset zoom">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg>
+        </button>
       </div>
-      <div id="zoom-indicator">100%</div>
     </div>
 
     <!-- Dashboard Sidebar -->
     <aside id="dashboard">
-
-      <!-- Active Step -->
-      <section class="dash-section active-step-section">
-        <div class="section-header">
-          <span class="section-dot pulse-dot"></span>
-          <span class="section-label">Active Step</span>
-        </div>
-        <div id="krebs-step-info" class="active-step-body">
-          <div class="step-enzyme" id="krebs-enzyme">&mdash;</div>
-          <div class="step-reaction" id="krebs-reaction">&mdash;</div>
-          <div class="step-yield" id="krebs-yield">&mdash;</div>
-        </div>
-        <div class="turn-counters">
-          <span class="counter"><span class="counter-lbl">Krebs</span><span id="krebs-turn" class="counter-val cv-krebs">0</span></span>
-          <span class="counter"><span class="counter-lbl">Calvin</span><span id="calvin-turn" class="counter-val cv-calvin">0</span></span>
-          <span class="counter"><span class="counter-lbl">Glyc</span><span id="glycolysis-run" class="counter-val cv-glyc">0</span></span>
-          <span class="counter"><span class="counter-lbl">PPP</span><span id="ppp-run" class="counter-val cv-ppp">0</span></span>
-        </div>
-      </section>
-
-      <!-- Metabolite Gauges -->
-      <section class="dash-section metab-section">
-        <div class="section-header">
-          <span class="section-label">Metabolites &amp; Redox</span>
-        </div>
-        <div class="metab-grid">
-          <div class="metab-card mc-atp">
-            <div class="metab-head">
-              <span class="metab-name">ATP / ADP</span>
-              <span class="metab-pct" id="atp-ratio">0%</span>
-            </div>
-            <div class="metab-track"><div class="metab-fill" id="atp-bar"></div></div>
-          </div>
-          <div class="metab-card mc-nadh">
-            <div class="metab-head">
-              <span class="metab-name">NADH / NAD⁺</span>
-              <span class="metab-pct" id="nadh-ratio">0%</span>
-            </div>
-            <div class="metab-track"><div class="metab-fill" id="nadh-bar"></div></div>
-          </div>
-          <div class="metab-card mc-nadph">
-            <div class="metab-head">
-              <span class="metab-name">NADPH / NADP⁺</span>
-              <span class="metab-pct" id="nadph-ratio">0%</span>
-            </div>
-            <div class="metab-track"><div class="metab-fill" id="nadph-bar"></div></div>
-          </div>
-          <div class="metab-card mc-fadh2">
-            <div class="metab-head">
-              <span class="metab-name">FADH₂ / FAD</span>
-              <span class="metab-pct" id="fadh2-ratio">0%</span>
-            </div>
-            <div class="metab-track"><div class="metab-fill" id="fadh2-bar"></div></div>
-          </div>
-        </div>
-      </section>
+      <div class="stats-header">
+        <h2 class="stats-title">Metabolism</h2>
+        <button id="close-stats" class="tool-btn" title="Close" aria-label="Close panel">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
 
       <!-- Tabbed Panels -->
       <div class="tabs-wrap">
@@ -181,6 +212,57 @@
 
           <!-- ── Stats ── -->
           <div class="tab-panel" id="tab-stats" role="tabpanel">
+            <!-- Active Step -->
+            <div class="stat-group active-step-group">
+              <div class="group-label"><span class="pulse-dot"></span> Active Step</div>
+              <div id="krebs-step-info" class="active-step-body">
+                <div class="step-enzyme" id="krebs-enzyme">&mdash;</div>
+                <div class="step-reaction" id="krebs-reaction">&mdash;</div>
+                <div class="step-yield" id="krebs-yield">&mdash;</div>
+              </div>
+              <div class="turn-counters">
+                <span class="counter"><span class="counter-lbl">Krebs</span><span id="krebs-turn" class="counter-val cv-krebs">0</span></span>
+                <span class="counter"><span class="counter-lbl">Calvin</span><span id="calvin-turn" class="counter-val cv-calvin">0</span></span>
+                <span class="counter"><span class="counter-lbl">Glyc</span><span id="glycolysis-run" class="counter-val cv-glyc">0</span></span>
+                <span class="counter"><span class="counter-lbl">PPP</span><span id="ppp-run" class="counter-val cv-ppp">0</span></span>
+              </div>
+            </div>
+
+            <!-- Metabolite Gauges -->
+            <div class="stat-group metab-group">
+              <div class="group-label">Metabolites &amp; Redox</div>
+              <div class="metab-grid">
+                <div class="metab-card mc-atp">
+                  <div class="metab-head">
+                    <span class="metab-name">ATP / ADP</span>
+                    <span class="metab-pct" id="atp-ratio">0%</span>
+                  </div>
+                  <div class="metab-track"><div class="metab-fill" id="atp-bar"></div></div>
+                </div>
+                <div class="metab-card mc-nadh">
+                  <div class="metab-head">
+                    <span class="metab-name">NADH / NAD⁺</span>
+                    <span class="metab-pct" id="nadh-ratio">0%</span>
+                  </div>
+                  <div class="metab-track"><div class="metab-fill" id="nadh-bar"></div></div>
+                </div>
+                <div class="metab-card mc-nadph">
+                  <div class="metab-head">
+                    <span class="metab-name">NADPH / NADP⁺</span>
+                    <span class="metab-pct" id="nadph-ratio">0%</span>
+                  </div>
+                  <div class="metab-track"><div class="metab-fill" id="nadph-bar"></div></div>
+                </div>
+                <div class="metab-card mc-fadh2">
+                  <div class="metab-head">
+                    <span class="metab-name">FADH₂ / FAD</span>
+                    <span class="metab-pct" id="fadh2-ratio">0%</span>
+                  </div>
+                  <div class="metab-track"><div class="metab-fill" id="fadh2-bar"></div></div>
+                </div>
+              </div>
+            </div>
+
             <div class="stat-group">
               <div class="group-label">Proton Motive Force</div>
               <div class="stat-row"><span class="stat-label">H&#x207A; Gradient (&#x0394;pH)</span><span class="stat-value" id="proton-gradient">0</span></div>
@@ -198,13 +280,13 @@
             <div class="ref-group">
               <div class="group-label">Pathway Net Equations</div>
               <div class="equation eq-glycolysis"><span class="eq-dot"></span><span class="eq-name">Glycolysis</span><span class="eq-formula">Glc &#x2192; 2 Pyr + 2 ATP + 2 NADH</span></div>
-              <div class="equation eq-calvin"><span class="eq-dot"></span><span class="eq-name">Calvin &#xD7;6</span><span class="eq-formula">6 CO&#x2082; + 18 ATP + 12 NADPH &#x2192; 2 G3P</span></div>
-              <div class="equation eq-krebs"><span class="eq-dot"></span><span class="eq-name">Krebs &#xD7;2</span><span class="eq-formula">2 AcCoA &#x2192; 4 CO&#x2082; + 6 NADH + 2 FADH&#x2082; + 2 ATP</span></div>
-              <div class="equation eq-ppp"><span class="eq-dot"></span><span class="eq-name">PPP &#xD7;6</span><span class="eq-formula">G6P &#x2192; 12 NADPH + 6 CO&#x2082;</span></div>
-              <div class="equation eq-oxphos"><span class="eq-dot"></span><span class="eq-name">OxPhos (NADH)</span><span class="eq-formula">NADH + &#xBD;O&#x2082; &#x2192; H&#x2082;O (&#x2248;2.5 ATP)</span></div>
-              <div class="equation eq-oxphos"><span class="eq-dot"></span><span class="eq-name">OxPhos (FADH&#x2082;)</span><span class="eq-formula">FADH&#x2082; + &#xBD;O&#x2082; &#x2192; H&#x2082;O (&#x2248;1.5 ATP)</span></div>
-              <div class="equation eq-light"><span class="eq-dot"></span><span class="eq-name">Linear Light</span><span class="eq-formula">H&#x2082;O &#x2192; &#xBD;O&#x2082; + NADPH (&#x2248;1.5 ATP)</span></div>
-              <div class="equation eq-cyclic"><span class="eq-dot"></span><span class="eq-name">Cyclic Light</span><span class="eq-formula">(4 H&#x207A; &#x2248; 1 ATP)</span></div>
+              <div class="equation eq-calvin"><span class="eq-dot"></span><span class="eq-name">Calvin Cycle &#xD7;6</span><span class="eq-formula">6 CO&#x2082; + 18 ATP + 12 NADPH &#x2192; 2 G3P</span></div>
+              <div class="equation eq-krebs"><span class="eq-dot"></span><span class="eq-name">Krebs Cycle &#xD7;2</span><span class="eq-formula">2 AcCoA &#x2192; 4 CO&#x2082; + 6 NADH + 2 FADH&#x2082; + 2 ATP</span></div>
+              <div class="equation eq-ppp"><span class="eq-dot"></span><span class="eq-name">Pentose Phosphate &#xD7;6</span><span class="eq-formula">G6P &#x2192; 12 NADPH + 6 CO&#x2082;</span></div>
+              <div class="equation eq-oxphos"><span class="eq-dot"></span><span class="eq-name">Oxidative Phosphorylation (NADH)</span><span class="eq-formula">NADH + &#xBD;O&#x2082; &#x2192; H&#x2082;O (&#x2248;2.5 ATP)</span></div>
+              <div class="equation eq-oxphos"><span class="eq-dot"></span><span class="eq-name">Oxidative Phosphorylation (FADH&#x2082;)</span><span class="eq-formula">FADH&#x2082; + &#xBD;O&#x2082; &#x2192; H&#x2082;O (&#x2248;1.5 ATP)</span></div>
+              <div class="equation eq-light"><span class="eq-dot"></span><span class="eq-name">Linear Light Reactions</span><span class="eq-formula">H&#x2082;O &#x2192; &#xBD;O&#x2082; + NADPH (&#x2248;1.5 ATP)</span></div>
+              <div class="equation eq-cyclic"><span class="eq-dot"></span><span class="eq-name">Cyclic Light Reactions</span><span class="eq-formula">(4 H&#x207A; &#x2248; 1 ATP)</span></div>
               <div class="equation eq-ferment"><span class="eq-dot"></span><span class="eq-name">Fermentation</span><span class="eq-formula">2 Pyr + 2 NADH &#x2192; 2 EtOH + 2 CO&#x2082;</span></div>
             </div>
 
@@ -229,6 +311,16 @@
       </div>
 
     </aside>
+
+    <!-- ─── Floating Glucose Bar (bottom) ─── -->
+    <div id="glucose-bar">
+      <button id="add-glucose-btn" class="glucose-pill" title="Add glucose to the system">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        Glucose
+      </button>
+    </div>
   </main>
 
   <!-- Tab switching (runs before sim.js, doesn't depend on it) -->

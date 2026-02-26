@@ -15,6 +15,8 @@ const Renderer = {
     isPanning: false, lastMX: 0, lastMY: 0,
     electrons: [], protons: [], photons: [],
     membraneY: 0, membraneH: 0,
+    sidebarInset: 0, _sidebarInsetCurrent: 0,
+    _sidebarAnimStart: 0, _sidebarAnimFrom: 0, _sidebarAnimTo: 0, _sidebarAnimating: false,
     etcComplexes: {}, metab: {},
     enzymeHitboxes: [],  // [{cx, cy, w, h, pathway, stepIndex}]
     metabPulse: {},      // { key: { startTime, prevCount } } for scale pulse on count change
@@ -216,12 +218,15 @@ const Renderer = {
 
     computeLayout() {
         const W = this.W, H = this.H;
+        // Effective layout width accounts for sidebar inset (content shifts left)
+        const LW = W - this._sidebarInsetCurrent;
+        this._LW = LW; // store for label drawing
 
         // ── MEMBRANE ──
         this.membraneY = H * 0.22;
         this.membraneH = 60;
         const memMid = this.membraneY + this.membraneH / 2;
-        const mPad = W * 0.02, mW = W - mPad * 2;
+        const mPad = LW * 0.02, mW = LW - mPad * 2;
 
         // Linearly distribute 13 complexes across the available membrane width
         const numComplexes = 13;
@@ -248,7 +253,7 @@ const Renderer = {
         // Clear below the tallest ETC complex (cxH * 0.8 / 2 extends below memMid)
         const top = this.membraneY + this.membraneH + 120;
         const rowH = (H - top + 200) / 5;
-        const col = (i) => W * (0.04 + i * 0.082);
+        const col = (i) => LW * (0.04 + i * 0.082);
         const r = [top, top + rowH, top + rowH * 2, top + rowH * 3, top + rowH * 4, top + rowH * 5];
 
         this.metab = {
@@ -290,8 +295,43 @@ const Renderer = {
     /* ==== MAIN DRAW ==== */
     draw(state) {
         const ctx = this.ctx;
-        const lm = state.lightOn; // lightMode flag
+        const lm = state.visualLightMode !== undefined ? state.visualLightMode : state.lightOn;
         this._currentLightMode = lm;
+
+        // Smoothly animate sidebar inset — matches CSS transition exactly:
+        // 0.45s cubic-bezier(0.23, 1, 0.32, 1)
+        if (this.sidebarInset !== this._sidebarAnimTo) {
+            this._sidebarAnimFrom = this._sidebarInsetCurrent;
+            this._sidebarAnimTo = this.sidebarInset;
+            this._sidebarAnimStart = performance.now();
+            this._sidebarAnimating = true;
+        }
+        if (this._sidebarAnimating) {
+            const elapsed = (performance.now() - this._sidebarAnimStart) / 450; // 0.45s
+            if (elapsed >= 1) {
+                this._sidebarInsetCurrent = this._sidebarAnimTo;
+                this._sidebarAnimating = false;
+            } else {
+                // cubic-bezier(0.23, 1, 0.32, 1) — sampled via De Casteljau
+                const t = elapsed;
+                const p1x = 0.23, p1y = 1, p2x = 0.32, p2y = 1;
+                // Newton-Raphson to solve bezier x(s) = t for s
+                let s = t;
+                for (let i = 0; i < 8; i++) {
+                    const s2 = s * s, s3 = s2 * s;
+                    const x = 3 * p1x * s * (1 - s) * (1 - s) + 3 * p2x * s2 * (1 - s) + s3 - t;
+                    const dx = 3 * p1x * (1 - s) * (1 - s) - 6 * p1x * s * (1 - s) + 6 * p2x * s * (1 - s) - 3 * p2x * s2 + 3 * s2;
+                    if (Math.abs(dx) < 1e-6) break;
+                    s -= x / dx;
+                }
+                s = Math.max(0, Math.min(1, s));
+                const s2 = s * s, s3 = s2 * s;
+                const ease = 3 * p1y * s * (1 - s) * (1 - s) + 3 * p2y * s2 * (1 - s) + s3;
+                this._sidebarInsetCurrent = this._sidebarAnimFrom + (this._sidebarAnimTo - this._sidebarAnimFrom) * ease;
+            }
+            this.computeLayout();
+        }
+
         ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
         ctx.clearRect(0, 0, this.W, this.H);
         ctx.save();
@@ -310,7 +350,8 @@ const Renderer = {
     },
 
     drawMembrane(ctx, lm, time) {
-        EnzymeStyles.drawMembrane(ctx, 0, this.membraneY, this.W, this.membraneH, lm, time);
+        // Extend membrane 400px past the right edge so it's visible behind the translucent sidebar
+        EnzymeStyles.drawMembrane(ctx, 0, this.membraneY, this.W + 400, this.membraneH, lm, time);
     },
 
     drawLabels(ctx, state, lm) {
@@ -318,25 +359,22 @@ const Renderer = {
         const th = EnzymeStyles.t(lm);
         ctx.fillStyle = th.sectionLabel;
         ctx.textAlign = 'center';
+        const cx = (this._LW || this.W) * 0.5;
 
-        const lightY = this.membraneY * 0.25;
+        const lightY = this.membraneY * 0.5;
         if (state.lightOn) {
             ctx.save();
             ctx.font = `500 14px ${_FONT.body}`; ctx.fillStyle = EnzymeStyles.roleColors.lightIndicator.stroke;
-            ctx.fillText('LIGHT', this.W * 0.5, lightY - 24);
+            ctx.fillText('LIGHT', cx, lightY - 24);
             ctx.font = `38px ${_FONT.emoji}`;
             ctx.shadowColor = `rgba(${EnzymeStyles.roleColors.lightIndicator.rgb},0.4)`; ctx.shadowBlur = 16;
-            ctx.fillText('☀', this.W * 0.5, lightY + 14); ctx.shadowBlur = 0;
+            ctx.fillText('☀', cx, lightY + 14); ctx.shadowBlur = 0;
             ctx.restore();
         } else {
             ctx.font = `500 14px ${_FONT.body}`; ctx.fillStyle = th.nightText;
-            ctx.fillText('DARK', this.W * 0.5, lightY - 24);
+            ctx.fillText('DARK', cx, lightY - 24);
             ctx.font = `38px ${_FONT.emoji}`; ctx.fillStyle = th.nightIcon;
-            ctx.fillText('☾', this.W * 0.5, lightY + 14);
-        }
-        if (!state.oxygenAvailable) {
-            ctx.font = `600 20px ${_FONT.mono}`; ctx.fillStyle = th.textMuted;
-            ctx.textAlign = 'right'; ctx.fillText('ANAEROBIC', this.W - 12, 26);
+            ctx.fillText('☾', cx, lightY + 14);
         }
     },
 

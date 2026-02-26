@@ -55,6 +55,12 @@
         autoplayToggle: document.getElementById('autoplay-toggle'),
         resetBtn: document.getElementById('reset-btn'),
         addGlucoseBtn: document.getElementById('add-glucose-btn'),
+        themeBtn: document.getElementById('theme-btn'),
+        menuBtn: document.getElementById('menu-btn'),
+        closeStats: document.getElementById('close-stats'),
+        dashboard: document.getElementById('dashboard'),
+        introScreen: document.getElementById('intro-screen'),
+        introStart: document.getElementById('intro-start'),
         // Ratio Bars
         atpBar: document.getElementById('atp-bar'), atpRatio: document.getElementById('atp-ratio'),
         nadhBar: document.getElementById('nadh-bar'), nadhRatio: document.getElementById('nadh-ratio'),
@@ -77,12 +83,29 @@
     /* ---- Init ---- */
     Renderer.init(dom.canvas);
 
+    // Theme: 0 = simulation (follows sunlight), 1 = light, 2 = dark
+    let themeMode = 0;
+    const _themeNames = ['auto', 'light', 'dark'];
+    const _themeTitles = ['Theme: Simulation', 'Theme: Light', 'Theme: Dark'];
+
+    function updateTheme() {
+        let isLight;
+        if (themeMode === 0) isLight = simState.lightOn;
+        else if (themeMode === 1) isLight = true;
+        else isLight = false;
+        simState.visualLightMode = isLight;
+        document.body.classList.toggle('light-mode', isLight);
+        if (dom.themeBtn) {
+            dom.themeBtn.setAttribute('data-theme', _themeNames[themeMode]);
+            dom.themeBtn.title = _themeTitles[themeMode];
+        }
+    }
+
     // Toggles
     dom.lightToggle.addEventListener('change', () => {
         simState.lightOn = dom.lightToggle.checked;
-        document.body.classList.toggle('light-mode', simState.lightOn);
+        if (themeMode === 0) updateTheme();
     });
-    document.body.classList.toggle('light-mode', simState.lightOn);
     dom.oxygenToggle.addEventListener('change', () => simState.oxygenAvailable = dom.oxygenToggle.checked);
     dom.glycToggle.addEventListener('change', () => simState.glycolysisEnabled = dom.glycToggle.checked);
     dom.pppToggle.addEventListener('change', () => simState.pppEnabled = dom.pppToggle.checked);
@@ -91,6 +114,43 @@
     if (dom.autoplayToggle) dom.autoplayToggle.addEventListener('change', () => simState.autoPlay = dom.autoplayToggle.checked);
     dom.resetBtn.addEventListener('click', resetSimulation);
     if (dom.addGlucoseBtn) dom.addGlucoseBtn.addEventListener('click', () => { store.glucose++; updateDashboard(); });
+
+    // Theme toggle — cycles through simulation / light / dark
+    if (dom.themeBtn) dom.themeBtn.addEventListener('click', () => {
+        themeMode = (themeMode + 1) % 3;
+        updateTheme();
+    });
+
+    // Menu button — toggles sidebar + smoothly pushes canvas layout
+    const _sidebarW = 374; // panel-w(350) + gap(24)
+    function toggleSidebar(forceClose) {
+        if (forceClose) {
+            dom.dashboard.classList.add('closed');
+        } else {
+            dom.dashboard.classList.toggle('closed');
+        }
+        const isClosed = dom.dashboard.classList.contains('closed');
+        if (dom.menuBtn) dom.menuBtn.classList.toggle('active', !isClosed);
+        Renderer.sidebarInset = isClosed ? 0 : _sidebarW;
+    }
+    if (dom.menuBtn) dom.menuBtn.addEventListener('click', () => toggleSidebar());
+    if (dom.closeStats) dom.closeStats.addEventListener('click', () => toggleSidebar(true));
+
+    // Intro screen dismissal
+    if (dom.introStart && dom.introScreen) {
+        dom.introStart.addEventListener('click', () => {
+            dom.introScreen.classList.add('hidden');
+            document.body.classList.add('app-ready');
+            setTimeout(() => { dom.introScreen.style.display = 'none'; }, 850);
+        });
+    }
+
+    // Initialize theme and sidebar inset
+    updateTheme();
+    Renderer.sidebarInset = _sidebarW;
+    Renderer._sidebarInsetCurrent = _sidebarW;
+    Renderer._sidebarAnimTo = _sidebarW;
+    Renderer.computeLayout();
 
     // Zoom controls
     const zoomInBtn = document.getElementById('zoom-in-btn');
