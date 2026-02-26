@@ -1,7 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════
-   Metabolism Simulator — Gerry-matched floating panel design
+   Metabolism Simulator
    Typography: Instrument Serif (display) · Geist (body) · Geist Mono (data)
-   Canvas fonts remain JetBrains Mono / Sora (enzymes.js _FONT)
    ═══════════════════════════════════════════════════════════════ */
 
 /* ───── Reset ───── */
@@ -68,7 +67,7 @@
 
 
 /* ═══════════════════════════════════════
-   INTRO SCREEN — Gerry-style title overlay
+   INTRO SCREEN
    ═══════════════════════════════════════ */
 #intro-screen {
   position: fixed;
@@ -597,7 +596,7 @@ main {
 }
 
 .stats-title {
-  font-family: 'Sora', var(--font-body);
+  font-family: var(--font-body);
   font-size: 0.72rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -867,7 +866,7 @@ main {
 .ctrl-group:last-child { margin-bottom: 0; }
 
 .group-label {
-  font-family: 'Sora', var(--font-body);
+  font-family: var(--font-body);
   font-weight: 600;
   font-size: 0.68rem;
   text-transform: uppercase;
