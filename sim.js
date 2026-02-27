@@ -124,13 +124,13 @@
     const _sidebarW = 374; // panel-w(350) + gap(24)
     function toggleSidebar(forceClose) {
         if (forceClose) {
-            dom.dashboard.classList.add('closed');
+            dom.dashboard.classList.remove('open');
         } else {
-            dom.dashboard.classList.toggle('closed');
+            dom.dashboard.classList.toggle('open');
         }
-        const isClosed = dom.dashboard.classList.contains('closed');
-        if (dom.menuBtn) dom.menuBtn.classList.toggle('active', !isClosed);
-        Renderer.sidebarInset = isClosed ? 0 : _sidebarW;
+        const isOpen = dom.dashboard.classList.contains('open');
+        if (dom.menuBtn) dom.menuBtn.classList.toggle('active', isOpen);
+        Renderer.sidebarInset = isOpen ? _sidebarW : 0;
     }
     if (dom.menuBtn) dom.menuBtn.addEventListener('click', () => toggleSidebar());
     if (dom.closeStats) dom.closeStats.addEventListener('click', () => toggleSidebar(true));
@@ -140,15 +140,16 @@
         dom.introStart.addEventListener('click', () => {
             dom.introScreen.classList.add('hidden');
             document.body.classList.add('app-ready');
+            dom.dashboard.classList.add('open');
             setTimeout(() => { dom.introScreen.style.display = 'none'; }, 850);
         });
     }
 
-    // Initialize theme and sidebar inset
+    // Initialize theme and sidebar inset (panel starts hidden, opens on intro dismiss)
     updateTheme();
-    Renderer.sidebarInset = _sidebarW;
-    Renderer._sidebarInsetCurrent = _sidebarW;
-    Renderer._sidebarAnimTo = _sidebarW;
+    Renderer.sidebarInset = 0;
+    Renderer._sidebarInsetCurrent = 0;
+    Renderer._sidebarAnimTo = 0;
     Renderer.computeLayout();
 
     // Zoom controls
