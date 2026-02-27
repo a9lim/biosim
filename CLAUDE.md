@@ -1,15 +1,16 @@
 # CLAUDE.md
 
-## Project Overview
+Part of the **a9l.im** portfolio. See parent `site-meta/CLAUDE.md` for the shared design system specification. Sibling projects: `physsim`, `gerry`.
 
-Metabolism Simulator — interactive HTML5 Canvas visualization of cellular metabolism. Click enzyme labels to advance reactions step-by-step, tracking metabolites and bioenergetics in real time.
+## Overview
 
-## Commands
+Metabolism Simulator — interactive HTML5 Canvas visualization of cellular metabolism. Click enzyme labels to advance reactions step-by-step, tracking metabolites and bioenergetics in real time. Zero dependencies — vanilla HTML5/CSS3/JS with ES6 IIFE pattern.
+
+## Running Locally
 
 ```bash
 npx serve .                    # serve locally (no build step)
 node -c *.js                   # syntax check (no test runner)
-lsof -ti:<port> | xargs kill -9  # kill stale server
 ```
 
 Verify HTML ↔ JS ID contract after restructuring:
@@ -20,11 +21,12 @@ diff <(grep -oP "getElementById\('\K[^']*" sim.js renderer.js | sed 's/.*://' | 
 
 ## Architecture
 
-Zero dependencies — vanilla HTML5/CSS3/JS, ES6 IIFE pattern. Scripts load in order via `<script>` tags:
+CSS loads `/shared-base.css` (shared reset, layout tokens, `.glass`, `.tool-btn`, intro screen, keyframes, tab system, ctrl-group/row) then `styles.css` (project overrides). Scripts load in order via `<script>` tags:
 
-0. **colors.js** → `_r`, `_FONT`, `_PALETTE`, `_parseHex`, `_rgb2hsl`, `_hsl2hex`, `_darkFill`, `_strokeDark`, `_makeBase`, `_BASE` — Single source of truth for all shared design tokens (colors, fonts) and color math helpers. Loads in `<head>`, injects `<style id="palette-vars">` with CSS custom properties (`:root` light defaults + `[data-theme="dark"]` overrides). Accent/fonts are mode-independent.
+0. **shared-tokens.js** → `_r`, `_parseHex`, `_rgb2hsl`, `_hsl2hex`, `_darken`, `_FONT`, `_PALETTE` (shared tokens + `extended` sub-object)
+0b. **colors.js** → extends `_PALETTE` with pathway colors via `_PALETTE.extended.*` references, defines `_darkFill`, `_makeBase`, `_BASE` families. Injects project-specific CSS vars (`--pw-*`, `--co-*`, `--tog-*`). Freezes all objects.
 1. **anim.js** → `Anim`, `_TWO_PI`, `_HALF_PI` — easing, fade trackers, trail ring-buffers, rotation accumulators. Must load before enzymes.js.
-2. **enzymes.js** → `EnzymeStyles`, `CFG`, `_ROLE`, `_THEME` — enzyme/particle/arrow drawing. Also exports `_F` (frozen pre-computed font strings) and `_labelFont(size)` cache for canvas `ctx.font` assignments. Color pipeline: `_PALETTE` → `_BASE` families → `_ROLE` semantics → `_pal()` palettes. `_THEME.dark`/`light` derived from `_PALETTE` values.
+2. **enzymes.js** → `EnzymeStyles`, `CFG`, `_ROLE`, `_THEME` — enzyme/particle/arrow drawing. Exports `_F` (frozen pre-computed font strings) and `_labelFont(size)` cache. Color pipeline: `_PALETTE` → `_BASE` families → `_ROLE` semantics → `_pal()` palettes. `_THEME.dark`/`light` derived from `_PALETTE` values.
 3. **renderer.js** → `Renderer` — Canvas 2D engine: layout, zoom/pan, hit detection, draw pipeline.
 4. **sim.js** → IIFE — `store` (metabolites), `simState` (toggles/flags), reaction logic, dashboard DOM sync, `requestAnimationFrame` loop.
 
@@ -44,33 +46,70 @@ Zero dependencies — vanilla HTML5/CSS3/JS, ES6 IIFE pattern. Scripts load in o
 - `simState` — pathway enables, environment flags (`lightOn`, `oxygenAvailable`), counters.
 - Bidirectional enzymes check both directions.
 
+### Membrane & ETC
+
+Membrane at `membraneY = H * 0.22`. Above = lumen, below = matrix/stroma. Proton pumps push H⁺ upward.
+
+ETC complex shapes in enzymes.js each have unique silhouettes. All share signature `(ctx, cx, cy, w, h, glow, lightMode)` — renderer.js positions/sizes are independent of shape internals.
+
+**Adding a New Complex:**
+1. **enzymes.js**: `draw<Name>()` shape + palette in `colors` + role in `_ROLE`
+2. **renderer.js**: Bump `numComplexes`, add position in `etcComplexes`, draw call + arrows + hitbox in `drawETCChain()`
+3. **sim.js**: Add to `_dispatch`, write `advance<Name>()`, add to autoplay ETC tick
+4. **index.html**: Update legend if needed
+5. **styles.css**: Add CSS variable if new color
+
 ## Color System
 
-See `colors.js` in Architecture above — `_PALETTE` is the single source of truth. Changing a hex there auto-updates both CSS custom properties and canvas JS.
+`_PALETTE` is the single source of truth. All 10 pathway/particle base hues reference `_PALETTE.extended.*` from `shared-tokens.js`. Changing a value in `shared-tokens.js` auto-updates both CSS custom properties and canvas JS.
 
 ### Pathway Colors (`_PALETTE.*` → `_BASE` → CSS `--pw-*`)
 
-| Pathway | Hex | `_PALETTE` key / CSS var |
-|---------|-----|--------------------------|
-| Glycolysis / Shared | `#d9924c` orange | `.orange` / `--pw-glyc` |
-| Calvin / Photosynthetic | `#52a87a` green | `.green` / `--pw-calvin` |
-| PPP / ATP Synthase | `#c85c74` rose | `.rose` / `--pw-ppp` |
-| Krebs / Respiratory ETC | `#5898ba` blue | `.blue` / `--pw-krebs` |
-| Cyclic / BR | `#a882bc` purple | `.purple` / `--pw-cyclic` |
-| Fermentation / NNT | `#9e6842` brown | `.brown` / `--pw-ferment` |
-| Electrons | `#48b4aa` cyan | `.cyan` / `--pw-electron` |
-| Protons | `#cc4c3c` red | `.red` / `--pw-proton` |
-| Photons | `#dbb850` yellow | `.yellow` / `--pw-photon` |
+| Pathway | Extended key | CSS var |
+|---------|-------------|---------|
+| Glycolysis / Shared | `extended.orange` | `--pw-glyc` |
+| Calvin / Photosynthetic | `extended.green` | `--pw-calvin` |
+| PPP / ATP Synthase | `extended.rose` | `--pw-ppp` |
+| Krebs / Respiratory ETC | `extended.blue` | `--pw-krebs` |
+| Cyclic / BR | `extended.purple` | `--pw-cyclic` |
+| Fermentation / NNT | `extended.brown` | `--pw-ferment` |
+| Electrons | `extended.cyan` | `--pw-electron` |
+| Protons | `extended.red` | `--pw-proton` |
+| Photons | `extended.yellow` | `--pw-photon` |
+| Neutral / Slate | `extended.slate` | — |
 
-### CSS Design Tokens
-
-No hardcoded colors — every CSS color is a `var()` or `color-mix()`. Non-color tokens (radius, layout, easing) remain in `styles.css` `:root`/`[data-theme="dark"]`. Alpha uses 8-digit hex (`#RRGGBBAA`).
-
-Naming convention: `--bg-*` (surfaces), `--text-*` (text), `--accent-*` (accent), `--tog-*` (toggles), `--pw-*` (pathways), `--co-*` (cofactors). Fonts: `--font-display` (Instrument Serif), `--font-body` (Geist), `--font-mono` (Geist Mono). Canvas uses `_FONT` from colors.js.
+Biosim-specific colors (not from `extended`): cofactor bars (`atp`, `nadh`, `nadph`, `fadh2`), `textOnAccent`, `light.togBg`.
 
 ### Canvas Theme (`_THEME`)
 
-`EnzymeStyles.t(lightMode)` returns mode-dependent colors for canvas text, surfaces, accents, membrane, and section labels. All derived from `_PALETTE` via `_r(hex, alpha)`. See `_THEME` in enzymes.js for full property list.
+`EnzymeStyles.t(lightMode)` returns mode-dependent colors for canvas text, surfaces, accents, membrane, and section labels. All derived from `_PALETTE` via `_r(hex, alpha)`.
+
+### CSS Design Tokens
+
+No hardcoded colors — every CSS color is a `var()` or `color-mix()`. Shared layout tokens in `shared-base.css`; project-specific overrides (e.g. `--tog-shadow`) in `styles.css`. Alpha uses 8-digit hex (`#RRGGBBAA`).
+
+Naming: `--bg-*` (surfaces), `--text-*` (text), `--accent-*` (accent), `--tog-*` (toggles), `--pw-*` (pathways), `--co-*` (cofactors).
+
+## UI & Layout
+
+### Theme
+
+Three-state toggle: **Simulation** (follows sunlight), **Light**, **Dark**. CSS `data-theme` on `<body>` (not `<html>` — unique among sibling projects). Canvas reads `simState.visualLightMode` (decoupled from sim `lightOn`). `getPalette(key, lightMode)` swaps fill/stroke.
+
+### Layout
+
+- **Intro** (`#intro-screen`): full overlay → `.hidden` → `.app-ready` on `<body>` triggers entrance animations
+- **Sidebar** (`#dashboard`): floating glass panel, tabbed — Controls / Stats / Reference (tab system from `shared-base.css`). `Renderer.sidebarInset` pushes canvas layout. Membrane extends `W + 400` to avoid cutoff.
+- **Glucose bar** (`#glucose-bar`): fixed bottom-center pill
+
+### Responsive Breakpoints
+
+- **900px**: body becomes scrollable, sidebar stacks below canvas (`position: relative`), glass stripped from dashboard. `#top-bar` goes sticky with `border-radius: 0`.
+- **600px**: tighter spacing, smaller tool buttons (30×30), reduced canvas height.
+
+### HTML ↔ JS Contract
+
+JS binds via `getElementById` (~40 IDs). **Only IDs must be preserved** — class names/hierarchy can change freely. CSS class refs in JS: `app-ready`, `closed`, `active`, `bump`. Data attributes: `data-theme` (`light`/`dark`).
 
 ## Key Patterns
 
@@ -81,40 +120,6 @@ Naming convention: `--bg-*` (surfaces), `--text-*` (text), `--accent-*` (accent)
 - `_drawRunArrow()` — shared helper for glycolysis run arrows (hitbox + label + arrowhead)
 - ATP Synthase and NNT always visible (no fade alpha); glow when `protonGradient > 0`. Other ETC complexes fade with `rA`/`phA`.
 
-## Membrane & ETC
-
-Membrane at `membraneY = H * 0.22`. Above = lumen, below = matrix/stroma. Proton pumps push H⁺ upward.
-
-ETC complex shapes in enzymes.js each have unique silhouettes. All share signature `(ctx, cx, cy, w, h, glow, lightMode)` — renderer.js positions/sizes are independent of shape internals.
-
-### Adding a New Complex
-
-1. **enzymes.js**: `draw<Name>()` shape + palette in `colors` + role in `_ROLE`
-2. **renderer.js**: Bump `numComplexes`, add position in `etcComplexes`, draw call + arrows + hitbox in `drawETCChain()`
-3. **sim.js**: Add to `_dispatch`, write `advance<Name>()`, add to autoplay ETC tick
-4. **index.html**: Update legend if needed
-5. **styles.css**: Add CSS variable if new color
-
-## UI
-
-### Theme
-
-Three-state toggle: **Simulation** (follows sunlight), **Light**, **Dark**. CSS `data-theme` on `<body>` toggles variables (`light` default, `dark` override). Canvas reads `simState.visualLightMode` (decoupled from sim `lightOn`). `getPalette(key, lightMode)` swaps fill/stroke.
-
-### Layout
-
-- **Intro** (`#intro-screen`): full overlay → `.hidden` → `.app-ready` on `<body>` triggers entrance animations
-- **Sidebar** (`#dashboard`): Gerry-style floating panel, tabbed — Controls / Stats / Reference. `Renderer.sidebarInset` pushes canvas layout. Membrane extends `W + 400` to avoid cutoff.
-- **Glucose bar** (`#glucose-bar`): fixed bottom-center pill
-
-### HTML ↔ JS Contract
-
-JS binds via `getElementById` (~40 IDs). **Only IDs must be preserved** — class names/hierarchy can change freely. CSS class refs in JS: `app-ready`, `closed`, `active`, `bump`. Data attributes: `data-theme` (`light`/`dark`).
-
-### Gerry Design System
-
-Floating panels use `.glass` class (`bg-panel` + blur + border + shadow), `position: fixed`, `border-radius: 20px`, warm earth-tone palette, three-tier shadows. Icons: Feather-style SVGs (`viewBox="0 0 24 24"`, `18×18`, `stroke-width="2"`).
-
 ### CSS Parameterization
 
 Repeated per-variant CSS blocks are collapsed via custom property assignments + generic rules:
@@ -122,4 +127,11 @@ Repeated per-variant CSS blocks are collapsed via custom property assignments + 
 - **Metabolite cards**: `.mc-*` classes set `--mc-color`, generic `[class*="mc-"]` rules style background/bar/text.
 - **Legend dots**: `.legend-dot.*` variants set `--dot-color`, one generic rule sets `background`.
 - **Equations**: `.eq-*` variants set `--eq-color`, one generic rule colors `.eq-name` and `.eq-dot`.
-- **Glass panels**: `.glass` class on `header`, `#canvas-controls`, `#glucose-bar`, `#dashboard` — `bg-panel` + `blur(24px) saturate(1.3)` + border + `shadow-md`. Dashboard overrides to `shadow-lg`. Tablet breakpoint strips glass from dashboard.
+- **Glass panels**: `.glass` class on `header`, `#canvas-controls`, `#glucose-bar`, `#dashboard`. Dashboard overrides to `shadow-lg`. Tablet breakpoint strips glass from dashboard.
+
+## Gotchas
+
+- **`data-theme` is on `<body>`, not `<html>`** — unique among all a9l.im projects. CSS theme rules depend on this.
+- **No `@import` in CSS** — fonts are loaded via `<link>` in HTML. Duplicate `@import` causes FOUC.
+- **Shared CSS at domain root** — `shared-base.css` is loaded via `/shared-base.css` (absolute path). When serving locally, serve from the parent `a9lim.github.io/` directory or the shared file won't resolve.
+- **Intro card SVGs keep their attributes** — `.tool-btn svg` defaults don't apply to intro cards. Those SVGs need explicit `fill="none" stroke="currentColor"` etc.
