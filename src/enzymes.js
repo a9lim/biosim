@@ -146,6 +146,7 @@ export const EnzymeStyles = {
     cyclic:             _pal(_ROLE.cyclic,            _BASE.purple.fill, 0.35),
     fermentation:       _pal(_ROLE.fermentation,      _BASE.brown.fill, 0.3),
     nnt:                _pal(_ROLE.nnt,               _BASE.brown.fill, 0.3),
+    uncoupling:         _pal(_ROLE.uncoupling,        _BASE.red.fill, 0.3),
     betaox:             _pal(_ROLE.betaox,            _darkFill(_BASE.yellow, 10), 0.3),
     betaoxActive:       _pal(_ROLE.betaox,            _darkFill(_BASE.yellow, 14), 0.5),
   },
