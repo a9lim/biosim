@@ -24,11 +24,10 @@ export function autoplayTick(dt) {
     metabolicTimer += dt;
     passiveDrainTimer += dt;
 
-    // Passive ATP/NADPH drain to mimic cellular maintenance
+    // Passive ATP drain to mimic cellular maintenance
     if (passiveDrainTimer > 1.6) {
         passiveDrainTimer = 0;
         if (store.atp > 2) store.atp -= 3;
-        if (store.nadph > 1) store.nadph -= 2;
         updateDashboard();
     }
 
