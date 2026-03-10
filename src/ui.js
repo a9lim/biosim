@@ -82,15 +82,40 @@ export function bindEvents(dom) {
     dom.lightToggle.addEventListener('change', () => {
         simState.lightOn = dom.lightToggle.checked;
         updateTheme(dom.themeBtn);
+        _haptics.trigger('light');
     });
-    dom.oxygenToggle.addEventListener('change', () => simState.oxygenAvailable = dom.oxygenToggle.checked);
-    dom.glycToggle.addEventListener('change', () => simState.glycolysisEnabled = dom.glycToggle.checked);
-    dom.pppToggle.addEventListener('change', () => simState.pppEnabled = dom.pppToggle.checked);
-    dom.calvinToggle.addEventListener('change', () => simState.calvinEnabled = dom.calvinToggle.checked);
-    dom.krebsToggle.addEventListener('change', () => simState.krebsEnabled = dom.krebsToggle.checked);
-    if (dom.betaoxToggle) dom.betaoxToggle.addEventListener('change', () => simState.betaoxEnabled = dom.betaoxToggle.checked);
-    if (dom.autoplayToggle) dom.autoplayToggle.addEventListener('change', () => simState.autoPlay = dom.autoplayToggle.checked);
-    dom.uncouplingToggle?.addEventListener('change', e => { simState.uncouplingEnabled = e.target.checked; });
+    dom.oxygenToggle.addEventListener('change', () => {
+        simState.oxygenAvailable = dom.oxygenToggle.checked;
+        _haptics.trigger('light');
+    });
+    dom.glycToggle.addEventListener('change', () => {
+        simState.glycolysisEnabled = dom.glycToggle.checked;
+        _haptics.trigger('light');
+    });
+    dom.pppToggle.addEventListener('change', () => {
+        simState.pppEnabled = dom.pppToggle.checked;
+        _haptics.trigger('light');
+    });
+    dom.calvinToggle.addEventListener('change', () => {
+        simState.calvinEnabled = dom.calvinToggle.checked;
+        _haptics.trigger('light');
+    });
+    dom.krebsToggle.addEventListener('change', () => {
+        simState.krebsEnabled = dom.krebsToggle.checked;
+        _haptics.trigger('light');
+    });
+    if (dom.betaoxToggle) dom.betaoxToggle.addEventListener('change', () => {
+        simState.betaoxEnabled = dom.betaoxToggle.checked;
+        _haptics.trigger('light');
+    });
+    if (dom.autoplayToggle) dom.autoplayToggle.addEventListener('change', () => {
+        simState.autoPlay = dom.autoplayToggle.checked;
+        _haptics.trigger('light');
+    });
+    dom.uncouplingToggle?.addEventListener('change', e => {
+        simState.uncouplingEnabled = e.target.checked;
+        _haptics.trigger('light');
+    });
 
     // ── Organism preset selector ──
     dom.organismSelect?.addEventListener('change', e => {
@@ -146,6 +171,7 @@ export function bindEvents(dom) {
         store.fadh2 = Math.round(store.totalFad * org.initialRatios.fadh2);
 
         dom.organismDesc.textContent = org.desc;
+        _haptics.trigger('medium');
     });
 
     // ── Reset ──
@@ -154,18 +180,19 @@ export function bindEvents(dom) {
         resetAutoplayTimers();
         Particles.electrons.length = 0; Particles.protons.length = 0; Particles.photons.length = 0; Renderer.metabPulse = {};
         updateDashboard();
+        _haptics.trigger('warning');
     });
 
     // ── Add substrates ──
-    if (dom.addGlucoseBtn) dom.addGlucoseBtn.addEventListener('click', () => { store.glucose++; updateDashboard(); });
-    if (dom.addFattyAcidBtn) dom.addFattyAcidBtn.addEventListener('click', () => { store.fattyAcid++; updateDashboard(); });
+    if (dom.addGlucoseBtn) dom.addGlucoseBtn.addEventListener('click', () => { store.glucose++; updateDashboard(); _haptics.trigger('light'); });
+    if (dom.addFattyAcidBtn) dom.addFattyAcidBtn.addEventListener('click', () => { store.fattyAcid++; updateDashboard(); _haptics.trigger('light'); });
 
     // ── Theme ──
-    if (dom.themeBtn) dom.themeBtn.addEventListener('click', () => cycleTheme(dom.themeBtn));
+    if (dom.themeBtn) dom.themeBtn.addEventListener('click', () => { cycleTheme(dom.themeBtn); _haptics.trigger('selection'); });
 
     // ── Sidebar ──
-    if (dom.menuBtn) dom.menuBtn.addEventListener('click', () => toggleSidebar(dom));
-    if (dom.closeStats) dom.closeStats.addEventListener('click', () => toggleSidebar(dom, true));
+    if (dom.menuBtn) dom.menuBtn.addEventListener('click', () => { toggleSidebar(dom); _haptics.trigger('light'); });
+    if (dom.closeStats) dom.closeStats.addEventListener('click', () => { toggleSidebar(dom, true); _haptics.trigger('light'); });
 
     // Swipe-to-dismiss for mobile bottom sheet
     if (typeof window.initSwipeDismiss === 'function' && dom.dashboard) {
@@ -181,6 +208,7 @@ export function bindEvents(dom) {
     if (dom.introStart && dom.introScreen) {
         dom.introStart.addEventListener('click', () => {
             dom.introScreen.classList.add('hidden');
+            _haptics.trigger('medium');
             document.body.classList.add('app-ready');
             // Auto-open sidebar on desktop
             if (!_isMobile()) {
