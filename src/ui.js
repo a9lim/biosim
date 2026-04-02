@@ -36,8 +36,7 @@ export function cacheDOMElements() {
         menuBtn: document.getElementById('menu-btn'),
         closeStats: document.getElementById('close-stats'),
         dashboard: document.getElementById('dashboard'),
-        introScreen: document.getElementById('intro-screen'),
-        introStart: document.getElementById('intro-start'),
+
         atpBar: document.getElementById('atp-bar'), atpRatio: document.getElementById('atp-ratio'),
         nadhBar: document.getElementById('nadh-bar'), nadhRatio: document.getElementById('nadh-ratio'),
         nadphBar: document.getElementById('nadph-bar'), nadphRatio: document.getElementById('nadph-ratio'),
@@ -189,9 +188,6 @@ export function bindEvents(dom) {
             Renderer.sidebarInset = (isOpen && !_isMobile()) ? _SIDEBAR_W : 0;
         }
     });
-
-    // ── Intro screen ──
-    _intro.init(dom.introScreen, dom.introStart);
 
     // ── Keyboard shortcuts (via shared-shortcuts.js) ──
     const toggleCheck = (el, setter) => {
