@@ -101,8 +101,8 @@
       "Reactive oxygen species production and scavenging"
     ],
     "educationalAlignment": [
-      {"@type": "AlignmentObject", "alignmentType": "educationalSubject", "targetName": "AP Biology"},
-      {"@type": "AlignmentObject", "alignmentType": "educationalSubject", "targetName": "NGSS HS-LS1: From Molecules to Organisms"}
+      {"@type": "AlignmentObject", "alignmentType": "educationalSubject", "targetName": "AP Biology", "targetUrl": "https://apcentral.collegeboard.org/courses/ap-biology"},
+      {"@type": "AlignmentObject", "alignmentType": "educationalSubject", "targetName": "NGSS HS-LS1: From Molecules to Organisms", "targetUrl": "https://www.nextgenscience.org/dci-arrangement/hs-ls1-from-molecules-to-organisms-structures-and-processes"}
     ],
     "datePublished": "2026-02-22",
     "dateModified": "2026-04-05",
@@ -121,14 +121,18 @@
       "url": "https://a9l.im"
     },
     "isBasedOn": [
-      {"@type": "ScholarlyArticle", "name": "Coupling of phosphorylation to electron and hydrogen transfer by a chemi-osmotic type of mechanism", "author": "P. Mitchell", "datePublished": "1961", "sameAs": "https://doi.org/10.1038/191144a0"}
+      {"@type": "ScholarlyArticle", "name": "Coupling of phosphorylation to electron and hydrogen transfer by a chemi-osmotic type of mechanism", "author": "P. Mitchell", "datePublished": "1961", "sameAs": "https://doi.org/10.1038/191144a0"},
+      {"@type": "Book", "name": "Biochemistry", "author": "J. M. Berg, J. L. Tymoczko, G. J. Gatto Jr., L. Stryer", "datePublished": "2019", "sameAs": "https://www.ncbi.nlm.nih.gov/books/NBK21154/"}
     ],
     "offers": {
       "@type": "Offer",
       "price": "0",
       "priceCurrency": "USD"
     },
-    "timeRequired": "PT30M"
+    "timeRequired": "PT30M",
+    "accessibilityFeature": ["highContrastDisplay", "readingOrder", "structuralNavigation"],
+    "accessibilityHazard": ["flashing", "motionSimulation"],
+    "relatedLink": ["https://a9l.im/geon", "https://a9l.im/shoals", "https://a9l.im/gerry"]
   }
   </script>
   <script type="application/ld+json">
@@ -246,7 +250,7 @@
   <!-- ═══ Main Layout ═══ -->
   <main>
     <div id="sim-container" class="canvas-container">
-      <canvas id="sim-canvas" aria-label="Cellular metabolism simulation canvas"></canvas>
+      <canvas id="sim-canvas" aria-label="Interactive cellular metabolism visualization showing twelve biochemical pathways and electron transport"></canvas>
       <div id="canvas-controls" class="sim-controls glass">
         <button id="zoom-in-btn" class="tool-btn" title="Zoom in" aria-label="Zoom in" data-icon="plus" data-icon-size="16"></button>
         <span id="zoom-indicator" class="zoom-level">100%</span>
