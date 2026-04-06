@@ -30,6 +30,10 @@ The electron transport chain model tracks the proton motive force (PMF) across t
 
 The model enforces strict conservation of NAD+/NADH, FAD/FADH2, CoA/acetyl-CoA, and ATP/ADP/AMP pools. Each reaction that consumes a cofactor must have a corresponding regeneration pathway active, or the pool depletes and the pathway stalls. This creates realistic metabolic bottlenecks.
 
+## Accessibility
+
+Cyano supports keyboard navigation for all controls, high-contrast mode via the theme toggle, and ARIA labels on toolbar buttons and enzyme labels. Metabolite levels are displayed as numerical values in the sidebar dashboard. Known hazards include continuous particle motion in the electron transport chain visualization; step-by-step mode is available as an alternative to autoplay.
+
 ## Fatty Acid Metabolism
 
 Beta-oxidation cleaves two-carbon units from fatty acyl-CoA chains, producing acetyl-CoA, NADH, and FADH2 per cycle. The simulator models chain lengths from C4 to C22 and tracks odd-chain fatty acids that produce propionyl-CoA requiring the methylmalonyl pathway. The reverse direction (fatty acid synthesis) consumes NADPH and ATP, coupling lipogenesis to the pentose phosphate pathway.
