@@ -19,6 +19,7 @@
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:type" content="image/webp">
+  <meta property="og:image:alt" content="Cyano cellular metabolism simulator">
   <meta name="twitter:site" content="@a9_lim">
   <meta name="twitter:creator" content="@a9_lim">
   <meta name="author" content="a9lim">
@@ -34,25 +35,25 @@
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
   <script src="/shared-tokens.js"></script>
-  <script src="/shared-touch.js"></script>
-  <script src="/shared-utils.js"></script>
-  <script src="/shared-haptics.js"></script>
-  <script src="/shared-camera.js"></script>
-  <script src="/shared-info.js"></script>
-  <script src="/shared-shortcuts.js"></script>
-  <script src="/shared-about.js"></script>
-  <script src="/shared-icons.js"></script>
-  <script src="/shared-toolbar.js"></script>
-  <script src="/shared-forms.js"></script>
+  <script defer src="/shared-touch.js"></script>
+  <script defer src="/shared-utils.js"></script>
+  <script defer src="/shared-haptics.js"></script>
+  <script defer src="/shared-camera.js"></script>
+  <script defer src="/shared-info.js"></script>
+  <script defer src="/shared-shortcuts.js"></script>
+  <script defer src="/shared-about.js"></script>
+  <script defer src="/shared-icons.js"></script>
+  <script defer src="/shared-toolbar.js"></script>
+  <script defer src="/shared-forms.js"></script>
 
-  <script src="/shared-sparkline.js"></script>
-  <script src="/shared-tooltip.js"></script>
-  <script src="colors.js"></script>
+  <script defer src="/shared-sparkline.js"></script>
+  <script defer src="/shared-tooltip.js"></script>
+  <script defer src="colors.js"></script>
 
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "WebApplication",
+    "@type": ["WebApplication", "LearningResource"],
     "name": "Cyano",
     "url": "https://a9l.im/cyano",
     "description": "Interactive cellular metabolism simulator covering 12 biochemical pathways including glycolysis, the Krebs cycle, the Calvin cycle, the pentose phosphate pathway, beta-oxidation, and fermentation. Features a 14-complex electron transport chain, allosteric enzyme regulation, reactive oxygen species production and scavenging, and five organism presets from cyanobacteria to animal cells.",
@@ -68,14 +69,26 @@
       {"@type": "Thing", "@id": "https://www.wikidata.org/wiki/Q514", "name": "Biochemistry"},
       {"@type": "Thing", "@id": "https://www.wikidata.org/wiki/Q7141", "name": "Cell biology"},
       {"@type": "Thing", "@id": "https://www.wikidata.org/wiki/Q131207", "name": "Metabolism"},
-      {"@type": "Thing", "name": "Glycolysis"},
-      {"@type": "Thing", "name": "Krebs cycle"},
-      {"@type": "Thing", "name": "Electron transport chain"},
-      {"@type": "Thing", "name": "Photosynthesis"}
+      {"@type": "Thing", "@id": "https://www.wikidata.org/wiki/Q26140", "name": "Glycolysis"},
+      {"@type": "Thing", "@id": "https://www.wikidata.org/wiki/Q71568", "name": "Krebs cycle"},
+      {"@type": "Thing", "@id": "https://www.wikidata.org/wiki/Q180959", "name": "Electron transport chain"},
+      {"@type": "Thing", "@id": "https://www.wikidata.org/wiki/Q11982", "name": "Photosynthesis"}
     ],
     "keywords": "metabolism simulator, glycolysis, Krebs cycle, Calvin cycle, electron transport chain, biochemistry, cellular respiration, photosynthesis, educational",
     "operatingSystem": "Any (Web Browser)",
     "browserRequirements": "Modern browser with Canvas support",
+    "codeRepository": "https://github.com/a9lim/a9lim.github.io",
+    "license": "https://www.gnu.org/licenses/agpl-3.0.html",
+    "interactivityType": "active",
+    "teaches": [
+      "Glycolysis, the Krebs cycle, and cellular respiration pathways",
+      "Electron transport chain and oxidative phosphorylation",
+      "Photosynthesis and the Calvin cycle",
+      "Allosteric enzyme regulation and feedback inhibition",
+      "Reactive oxygen species production and scavenging"
+    ],
+    "datePublished": "2026-02-22",
+    "dateModified": "2026-04-05",
     "author": {
       "@type": "Person",
       "name": "a9lim",
@@ -96,6 +109,81 @@
       "priceCurrency": "USD"
     }
   }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What metabolic pathways does Cyano simulate?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Cyano models twelve pathways: glycolysis, gluconeogenesis, the pentose phosphate pathway, the Krebs (TCA) cycle, beta-oxidation, fatty acid synthesis, the Calvin cycle, light reactions of photosynthesis, ethanol and lactate fermentation, the urea cycle, and amino acid catabolism. All pathways share metabolite pools including ATP, NADH, FADH2, and acetyl-CoA."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does the electron transport chain work in Cyano?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The simulator models a 14-complex electron transport chain tracing electrons from NADH and FADH2 through Complexes I through IV and ATP synthase. Proton motive force across the membrane drives oxidative phosphorylation. The model includes proton leak, uncoupling, and reactive oxygen species generation at Complexes I and III."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is allosteric regulation in cellular metabolism?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Allosteric regulation is the control of enzyme activity by molecules binding at sites other than the active site. In Cyano, key control points include phosphofructokinase (inhibited by ATP and citrate), pyruvate dehydrogenase (inhibited by acetyl-CoA and NADH), and isocitrate dehydrogenase (activated by ADP). This feedback maintains metabolic homeostasis."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What organism presets are available?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Five presets configure different pathway availability: cyanobacteria (photosynthesis and respiration), animal cells (respiration only), plant cells (both with Calvin cycle), yeast (fermentation-capable), and obligate anaerobes. Each reflects real biochemical constraints of that organism type."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do reactive oxygen species work in Cyano?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Electrons leak from Complexes I and III of the electron transport chain, generating superoxide radicals. The cell responds with scavenging enzymes (SOD, catalase) that convert ROS to water. Excess ROS damages cell integrity."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does Cyano collect any personal data?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. Cyano runs entirely in your browser with no server-side processing, no cookies, and no analytics tracking. All simulation state stays on your device."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is Cyano free and open source?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Cyano is licensed under AGPL-3.0 and the source code is available on GitHub. It is free to use for educational and personal purposes."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does Cyano work on mobile devices?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Cyano is fully responsive with touch-optimized controls. The metabolic simulation runs on any modern browser with Canvas support."
+        }
+      }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://a9l.im"},{"@type":"ListItem","position":2,"name":"Cyano"}]}
   </script>
 </head>
 
@@ -399,7 +487,21 @@
     </div>
   </main>
 
-  <script src="/shared-tabs.js"></script>
+  <details class="edu-content">
+    <summary>About this simulation</summary>
+    <article>
+      <h2>What is Cyano?</h2>
+      <p>Cyano is an interactive cellular metabolism simulator that traces how cells produce and consume energy through interconnected biochemical pathways. Click enzyme labels on the canvas to advance reactions step by step, or enable autoplay to watch the full metabolic network operate continuously.</p>
+      <h3>Metabolic Pathways</h3>
+      <p>Twelve pathways run on a shared metabolite grid. Glycolysis breaks glucose into pyruvate, generating 2 ATP and 2 NADH. The Krebs cycle oxidizes acetyl-CoA to CO&sub2;, producing GTP, NADH, and FADH&sub2;. The electron transport chain converts NADH and FADH&sub2; into a proton gradient that drives ATP synthase. Photosynthetic organisms additionally run the Calvin cycle, fixing CO&sub2; into G3P using ATP and NADPH from the light reactions.</p>
+      <h3>Regulation</h3>
+      <p>Every reaction is gated by allosteric regulation. Phosphofructokinase, the committed step of glycolysis, is inhibited by ATP and citrate &mdash; high energy charge slows glucose consumption. Pyruvate dehydrogenase is inhibited by its own products (acetyl-CoA and NADH). These feedback loops maintain homeostasis and prevent metabolic waste.</p>
+      <h3>Reactive Oxygen Species</h3>
+      <p>Complexes I and III of the electron transport chain leak electrons to molecular oxygen, forming superoxide radicals. The simulator tracks ROS accumulation and the enzymatic scavenging response (superoxide dismutase, catalase). Excessive ROS damages cell health, visible as declining cell integrity in the dashboard.</p>
+    </article>
+  </details>
+
+  <script defer src="/shared-tabs.js"></script>
 
   <script type="module" src="main.js"></script>
 </body>
