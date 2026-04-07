@@ -114,7 +114,7 @@ main {
   height: 6px;
   border-radius: 50%;
   background: var(--accent);
-  animation: pulse-dot 2.5s ease-in-out infinite;
+  animation: pulse-dot 2.5s var(--ease-in-out) infinite;
   flex-shrink: 0;
   vertical-align: middle;
   margin-right: 0.35rem;
@@ -198,7 +198,7 @@ main {
   background: var(--metab-card-bg);
   border-radius: var(--radius);
   padding: 0.4rem 0.5rem;
-  transition: background 0.28s ease;
+  transition: background 0.28s var(--ease-smooth);
 }
 
 .metab-head {
@@ -237,7 +237,7 @@ main {
   height: 100%;
   width: 0%;
   border-radius: var(--radius);
-  transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: width 0.4s var(--ease-smooth);
 }
 
 /* Per-card --mc-color assignments; one generic rule styles all variants */
@@ -342,13 +342,13 @@ main {
   display: inline;
   font-family: var(--font-sans);
   font-weight: 600;
-  font-size: 0.72rem;
+  font-size: var(--font-sm);
 }
 
 .eq-formula {
   display: block;
   font-family: var(--font-mono);
-  font-size: 0.62rem;
+  font-size: var(--font-sm);
   color: var(--text-muted);
   line-height: 1.4;
   padding-left: calc(5px + 0.4em);
@@ -521,29 +521,29 @@ main {
 }
 
 
-.organism-desc { font-size: 0.75rem; color: var(--text-muted); margin: 4px 0 0; }
+.organism-desc { font-size: var(--font-base); color: var(--text-muted); margin: 4px 0 0; }
 
 
 /* ───── Canvas Tooltip — uses shared-tooltip.js (sim-tooltip) with cyano overrides ───── */
 .sim-tooltip.canvas-tip {
   white-space: normal;
   max-width: 280px;
-  font: 0.75rem/1.45 var(--font-sans);
+  font: var(--font-base)/1.45 var(--font-sans);
 }
 .sim-tooltip.canvas-tip strong {
-  font-size: 0.8rem;
+  font-size: var(--font-base);
   color: var(--text);
 }
 .sim-tooltip.canvas-tip .ct-full {
-  font-size: 0.7rem;
+  font-size: var(--font-sm);
   color: var(--text-secondary);
 }
 .sim-tooltip.canvas-tip .ct-eq {
-  font: 0.72rem var(--font-mono);
+  font: var(--font-sm) var(--font-mono);
   color: var(--accent);
 }
 .sim-tooltip.canvas-tip em {
-  font-size: 0.7rem;
+  font-size: var(--font-sm);
   color: var(--text-muted);
 }
 
