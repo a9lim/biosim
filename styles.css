@@ -196,7 +196,7 @@ main {
 
 .metab-card {
   background: var(--metab-card-bg);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius);
   padding: 0.4rem 0.5rem;
   transition: background 0.28s ease;
 }
@@ -221,7 +221,7 @@ main {
   font-family: var(--font-mono);
   font-weight: 700;
   font-size: clamp(0.82rem, 1.2vw, 0.95rem);
-  transition: transform 0.2s var(--ease-spring);
+  transition: transform 0.2s var(--ease-out);
   display: inline-block;
 }
 
@@ -229,14 +229,14 @@ main {
   width: 100%;
   height: 4px;
   background: var(--bg-track);
-  border-radius: 2px;
+  border-radius: var(--radius);
   overflow: hidden;
 }
 
 .metab-fill {
   height: 100%;
   width: 0%;
-  border-radius: 2px;
+  border-radius: var(--radius);
   transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
@@ -259,7 +259,7 @@ main {
 #atp-source-bar {
   display: flex;
   height: 6px;
-  border-radius: 3px;
+  border-radius: var(--radius);
   overflow: hidden;
   width: 100%;
 }
@@ -308,7 +308,7 @@ main {
    STATS — scale-bounce animation on value change
    ═══════════════════════════════════════ */
 .stat-value {
-  transition: transform 0.15s var(--ease-spring);
+  transition: transform 0.15s var(--ease-out);
 }
 
 .stat-value.bump, .metab-pct.bump { transform: scale(1.25); }
@@ -340,7 +340,7 @@ main {
 
 .eq-name {
   display: inline;
-  font-family: var(--font-body);
+  font-family: var(--font-sans);
   font-weight: 600;
   font-size: 0.72rem;
 }
@@ -379,7 +379,7 @@ main {
 }
 
 .legend-sub {
-  font-family: var(--font-body);
+  font-family: var(--font-sans);
   font-size: clamp(0.46rem, 0.7vw, 0.52rem);
   font-weight: 600;
   text-transform: uppercase;
@@ -528,7 +528,7 @@ main {
 .sim-tooltip.canvas-tip {
   white-space: normal;
   max-width: 280px;
-  font: 0.75rem/1.45 var(--font-body);
+  font: 0.75rem/1.45 var(--font-sans);
 }
 .sim-tooltip.canvas-tip strong {
   font-size: 0.8rem;
